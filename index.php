@@ -53,6 +53,7 @@ if($text) {
 		]);
 	} elseif ($text == "Последние статьи") {
 		$html = simplexml_load_file('http://ru-an.info/RSS/tag117.xml');
+		$reply = "";
 		
 		foreach ($html->channel->item as $item) {
 			$reply .= 
