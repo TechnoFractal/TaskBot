@@ -19,8 +19,7 @@ $name = $result["message"]["from"]["username"];
 //Клавиатура
 $keyboard = [
 	["Последние статьи"],
-	["Картинка"],
-	["Гифка"]
+	["Кошка"]
 ];
 
 if($text) {
@@ -38,7 +37,7 @@ if($text) {
 			'reply_markup' => $reply_markup 
 		]);
 	} elseif ($text == "/help") {
-		$reply = "Информация с помощью (Слава Котам!!!)";
+		$reply = "Слава Котам!!!";
 		$telegram->sendMessage([ 
 			'chat_id' => $chat_id, 
 			'text' => $reply 
@@ -52,17 +51,8 @@ if($text) {
 			'photo' => $url, 
 			'caption' => "Описание." 
 		]);
-	} elseif ($text == "Гифка") {
-		$url = "https://68.media.tumblr.com/" . 
-				"bd08f2aa85a6eb8b7a9f4b07c0807d71/" . 
-				"tumblr_ofrc94sG1e1sjmm5ao1_400.gif";
-		$telegram->sendDocument([ 
-			'chat_id' => $chat_id, 
-			'document' => $url, 
-			'caption' => "Описание." 
-		]);
 	} elseif ($text == "Последние статьи") {
-		$html = simplexml_load_file('http://netology.ru/blog/rss.xml');
+		$html = simplexml_load_file('http://ru-an.info/RSS/tag117.xml');
 		
 		foreach ($html->channel->item as $item) {
 			$reply .= 
@@ -89,12 +79,11 @@ if($text) {
 	}
 }else{
 	$debug = print_r($result, true);
-	$debug = "Debug: ```$debug```";
 	
 	$telegram->sendMessage([ 
 		'chat_id' => $chat_id, 
-		'parse_mode' => 'HTML', 
+		'parse_mode' => 'Markdown', 
 		'disable_web_page_preview' => true, 
-		'text' => $debug 
+		'text' => "```$debug```"
 	]);
 }
