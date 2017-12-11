@@ -54,7 +54,7 @@ if($text) {
 	} elseif ($text == "Последние статьи") {
 		$html = simplexml_load_file('http://ru-an.info/RSS/tag117.xml');
 		$reply = "";
-		
+		error_log(print_r($html, true));
 		foreach ($html->channel->item as $item) {
 			$reply .= 
 				"\xE2\x9E\xA1 " . 
