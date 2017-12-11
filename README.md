@@ -6,7 +6,10 @@ composer install
 
 # Configure web hook
 
-https://api.telegram.org/botTOKEN/setWebhook?url=https://host.com
+curl \
+	-F "url=https://<YOURDOMAIN.EXAMPLE>/<WEBHOOKLOCATION>" \
+	-F "certificate=@<YOURCERTIFICATE>.pem" \
+	https://api.telegram.org/bot<YOURTOKEN>/setWebhook
 
 # Config
 
