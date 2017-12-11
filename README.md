@@ -1,5 +1,19 @@
 > Powered by Koshka!
 
+# SSl
+
+```
+openssl req
+-newkey rsa:2048
+-sha256 
+-nodes 
+-keyout YOURPRIVATE.key
+-x509
+-days 365
+-out YOURPUBLIC.pem
+-subj "/C=US/ST=City/L=Brooklyn/O=Company/CN=YOURDOMAIN.EXAMPLE"
+```
+
 # Install dependencies
 
 composer install
