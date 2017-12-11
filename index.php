@@ -25,7 +25,7 @@ $keyboard = [
 
 if($text) {
 	 if ($text == "/start") {
-		$reply = "Добро пожаловать в бота!";
+		$reply = "Добро пожаловать в КошкинБот!";
 		$reply_markup = $telegram->replyKeyboardMarkup([ 
 			'keyboard' => $keyboard, 
 			'resize_keyboard' => true, 
@@ -38,8 +38,11 @@ if($text) {
 			'reply_markup' => $reply_markup 
 		]);
 	} elseif ($text == "/help") {
-		$reply = "Информация с помощью.";
-		$telegram->sendMessage([ 'chat_id' => $chat_id, 'text' => $reply ]);
+		$reply = "Информация с помощью (Слава Котам!!!)";
+		$telegram->sendMessage([ 
+			'chat_id' => $chat_id, 
+			'text' => $reply 
+		]);
 	} elseif ($text == "Картинка") {
 		$url = "https://68.media.tumblr.com/" . 
 				"6d830b4f2c455f9cb6cd4ebe5011d2b8/" . 
@@ -86,6 +89,7 @@ if($text) {
 	}
 }else{
 	$debug = print_r($result, true);
+	$debug = "Debug: ```$debug```";
 	
 	$telegram->sendMessage([ 
 		'chat_id' => $chat_id, 
@@ -93,6 +97,4 @@ if($text) {
 		'disable_web_page_preview' => true, 
 		'text' => $debug 
 	]);
-	
-	$telegram->sendMessage([ 'chat_id' => $chat_id, 'text' => "Отправьте текстовое сообщение." ]);
 }
