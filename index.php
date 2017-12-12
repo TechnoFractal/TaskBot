@@ -45,12 +45,12 @@ if($text) {
 	} elseif ($text == "Кошке нужна валерьянка") {
 		$telegram->sendSticker([ 
 			'chat_id' => $chat_id, 
-			'photo' => 'CAADBAADxgMAAv4zDQY6bEeD67rtlAI'
+			'sticker' => 'CAADBAADxgMAAv4zDQY6bEeD67rtlAI'
 		]);
 	} elseif ($text == "Мишка )") {
 		$telegram->sendSticker([ 
 			'chat_id' => $chat_id, 
-			'photo' => 'CAADAgADnQQAAmvEygrzEw25pNCS5wI'
+			'sticker' => 'CAADAgADnQQAAmvEygrzEw25pNCS5wI'
 		]);
 	} else {
 		$reply = "По запросу \"<b>".$text."</b>\" ничего не найдено.";
