@@ -18,7 +18,8 @@ $chat_id = $result["message"]["chat"]["id"];
 $name = $result["message"]["from"]["username"];
 //Клавиатура
 $keyboard = [
-	["Кошке нужна валерьянка"]
+	["Кошке нужна валерьянка"],
+	["Мишка )"]
 ];
 
 if($text) {
@@ -42,9 +43,14 @@ if($text) {
 			'text' => $reply 
 		]);
 	} elseif ($text == "Кошке нужна валерьянка") {
-		$telegram->sendPhoto([ 
+		$telegram->sendSticker([ 
 			'chat_id' => $chat_id, 
-			'photo' => 'AAQEABN6XXIwAASkbErsEa--LcZFAAIC'
+			'photo' => 'CAADBAADxgMAAv4zDQY6bEeD67rtlAI'
+		]);
+	} elseif ($text == "Мишка )") {
+		$telegram->sendSticker([ 
+			'chat_id' => $chat_id, 
+			'photo' => 'CAADAgADnQQAAmvEygrzEw25pNCS5wI'
 		]);
 	} else {
 		$reply = "По запросу \"<b>".$text."</b>\" ничего не найдено.";
@@ -55,12 +61,17 @@ if($text) {
 		]);
 	}
 }else{
-	$debug = print_r($result, true);
+	$telegram->sendMessage([ 
+		'chat_id' => $chat_id, 
+		'text' => "Отправьте текстовое сообщение." 
+	]);
+	
+	/*$debug = print_r($result, true);
 	
 	$telegram->sendMessage([ 
 		'chat_id' => $chat_id, 
 		'parse_mode' => 'Markdown', 
 		'disable_web_page_preview' => true, 
 		'text' => "```$debug```"
-	]);
+	]);*/
 }
