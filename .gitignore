@@ -1,6 +1,7 @@
 /nbproject/private/
 /admin/node_modules/
 /admin/build/
+/admin/shared/
 /vendor/
 /config.yml
 *.lock

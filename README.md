@@ -109,12 +109,21 @@ curl \
 
 ```
 sudo npm install -g n
+n latest
 npm install pm2 -g
 cd admin
 npm install
-npm run build
-serve -s build
 ```
 
-https://ygamretuta.xyz/deploy-create-react-app-with-pm2-16beb90ce52
-https://react-server.io/docs/guides/production
+1. `npm start` - For debug
+2. `npm run build` - For Build
+3. `serve -s build` - For test of deploy package
+4. `pm2 start app.js` - For demonize the deploy package
+
+Demonization will occure on port 5000
+
+# Nginx
+
+Forvar admin.domain.org:80 to localhost:5000
+
+https://github.com/kenjis/codeigniter-composer-installer
