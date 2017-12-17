@@ -1,4 +1,7 @@
 /nbproject/private/
+/admin/node_modules/
+/admin/build/
 /vendor/
-*.lock
 /config.yml
+*.lock
+*lock.json
