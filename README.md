@@ -61,9 +61,17 @@ Set apache2 listen on port 8080 instead of 80
 
 ## Admin API backend
 
+Host must be named: telegrammbotapi
+
+Add entry to /etc/hosts:
+
+```
+127.0.0.1	telegrammbotapi
+```
+
 ```
 <VirtualHost *:8080>
-	ServerName backend.domain.org
+	ServerName telegrammbotapi
 
 	ServerAdmin admin@domain.org
 	DocumentRoot /path/to/project/ci/public
@@ -72,7 +80,7 @@ Set apache2 listen on port 8080 instead of 80
 		AllowOverride all
 		Require all granted
 	</Directory>
-    <Directory /path/to/project/backend/admin/vendor/>
+    <Directory /path/to/project/backend/vendor/>
         AllowOverride all
         Require all granted
     </Directory>
@@ -86,7 +94,7 @@ Set apache2 listen on port 8080 instead of 80
 ## Configure /ci/public/index.php find and adjust follow:  
 
 ```
-$application_folder = '../../backend/admin/application';
+$application_folder = '../../backend/application';
 $system_path = '../../backend/vendor/codeigniter/framework/system';
 ```
 
@@ -114,7 +122,7 @@ curl \
 
 # Config
 
-Create config.yml in root of the project and put:
+Create config.yml in /backend/bot folder and put:
 
 ```
 token: "BOT_TOKEN"
@@ -166,8 +174,8 @@ npm install
 3. `serve -s build` - For test of deploy package
 4. `pm2 start app.js` - For demonize the deploy package
 
-Demonization will occure on port 5000
+Demonization will occure on port 3000
 
 # Nginx
 
-Forvar admin.domain.org:80 to localhost:5000
+Forvar admin.domain.org:80 to localhost:3000

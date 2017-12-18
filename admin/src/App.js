@@ -13,7 +13,7 @@ const App = () => (
 		authClient={authClient}
 		dashboard={Dashboard}
 		restClient={
-			jsonServerRestClient('http://jsonplaceholder.typicode.com')
+			jsonServerRestClient('http://telegrammbotapi:8080')
 		}>
 		<Resource 
 			icon={PostIcon}
