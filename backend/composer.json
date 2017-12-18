@@ -1,0 +1,8 @@
+{
+    "require": {
+		"php": ">=5.3.2",
+		"irazasyed/telegram-bot-sdk": "^2.0",
+		"symfony/yaml": "*",
+		"codeigniter/framework": "3.1.*"
+    }
+}

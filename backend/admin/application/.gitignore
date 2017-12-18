@@ -1,0 +1,10 @@
+/cache/*
+!/cache/index.html
+/logs/*
+!/logs/index.html
+/config/*
+!/config/autoload.php
+!/config/hooks.php
+!/config/routes.php
+!/config/index.html
+/views/errors

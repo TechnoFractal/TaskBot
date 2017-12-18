@@ -1,8 +1,12 @@
+.LCK.gitignore~
+
 /nbproject/private/
 /admin/node_modules/
 /admin/build/
 /admin/shared/
-/vendor/
-/config.yml
+/backend/vendor/
+/backend/config.yml
+
+/ci
 *.lock
 *lock.json

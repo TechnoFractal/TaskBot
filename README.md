@@ -25,14 +25,18 @@ curl \
 	https://api.telegram.org/bot<YOURTOKEN>/setWebhook
 ```
 
-# VHost config
+# VHosts config
+
+Set apache2 listen on port 8080 instead of 80
+
+## Bot host
 
 ```
 <IfModule mod_ssl.c>
 	<VirtualHost *:443>
 		ServerAdmin admin@domain.org
-		ServerName domain.org
-		DocumentRoot /path/to/bot
+		ServerName bot.domain.org
+		DocumentRoot /path/to/project/backend/bot
 
 		ErrorLog ${APACHE_LOG_DIR}/koshkabot.log
 		CustomLog ${APACHE_LOG_DIR}/koshkabot-access.log combined
@@ -46,7 +50,7 @@ curl \
 				SSLOptions +StdEnvVars
 		</FilesMatch>
 
-		<Directory "/path/to/bot">
+		<Directory /path/to/project/backend/bot>
 			Options Indexes FollowSymLinks
 			AllowOverride All
 			Require all granted
@@ -55,16 +59,58 @@ curl \
 </IfModule>
 ```
 
+## Admin API backend
+
+```
+<VirtualHost *:8080>
+	ServerName backend.domain.org
+
+	ServerAdmin admin@domain.org
+	DocumentRoot /path/to/project/ci/public
+
+	<Directory /path/to/project/ci/public>
+		AllowOverride all
+		Require all granted
+	</Directory>
+    <Directory /path/to/project/backend/admin/vendor/>
+        AllowOverride all
+        Require all granted
+    </Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/botapi_error.log
+	CustomLog ${APACHE_LOG_DIR}/botapi_access.log combined
+</VirtualHost>
+
+```
+
+## Configure /ci/public/index.php find and adjust follow:  
+
+```
+$application_folder = '../../backend/admin/application';
+$system_path = '../../backend/vendor/codeigniter/framework/system';
+```
+
 # Install dependencies
 
+```
 composer install
+```
+
+# Codeigniter
+
+Run from the root of project:  
+```
+./installci.sh
+```
 
 # Configure web hook
 
+```
 curl \
 	-F "url=https://<YOURDOMAIN.EXAMPLE>/<WEBHOOKLOCATION>" \
 	-F "certificate=@<YOURCERTIFICATE>.pem" \
 	https://api.telegram.org/bot<YOURTOKEN>/setWebhook
+```
 
 # Config
 
@@ -125,5 +171,3 @@ Demonization will occure on port 5000
 # Nginx
 
 Forvar admin.domain.org:80 to localhost:5000
-
-https://github.com/kenjis/codeigniter-composer-installer
