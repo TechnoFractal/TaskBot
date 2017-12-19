@@ -16,5 +16,7 @@ cp application/config/profiler.php ../backend/application/config/
 cp application/config/config.php ../backend/application/config/
 rm composer.*
 rm .gitignore
+rm README.md
 rm -rf vendor
 rm -rf application
+rm -rf bin

@@ -76,6 +76,8 @@ Add entry to /etc/hosts:
 	ServerAdmin admin@domain.org
 	DocumentRoot /path/to/project/ci/public
 
+	Alias /admin /path/to/project/admin/build/
+
 	<Directory /path/to/project/ci/public>
 		AllowOverride all
 		Require all granted
@@ -84,6 +86,10 @@ Add entry to /etc/hosts:
         AllowOverride all
         Require all granted
     </Directory>
+	<Directory /path/to/project/admin/build/>
+		AllowOverride all
+		Require all granted
+	</Directory>
 
 	ErrorLog ${APACHE_LOG_DIR}/botapi_error.log
 	CustomLog ${APACHE_LOG_DIR}/botapi_access.log combined
@@ -111,6 +117,18 @@ Run from the root of project:
 ./installci.sh
 ```
 
+# DB
+
+```
+mysql -uroot -p
+create database telegrammbot;
+create user 'telegrammbot'@'localhost' identified by 'password';
+grant all privileges on telegrammbot.* to 'telegrammbot'@'localhost';
+flush privileges;
+```
+
+Configure /backend/application/config/database.php
+
 # Configure web hook
 
 ```
@@ -122,11 +140,19 @@ curl \
 
 # Config
 
-Create config.yml in /backend/bot folder and put:
+Create config.yml in /backend/ folder and put:
 
 ```
 token: "BOT_TOKEN"
+db:
+  user: dbuser
+  password: bdpassword
 ```
+
+Run at /backend:  
+* For create: `vendor/bin/doctrine orm:schema-tool:create`  
+* For drop: `vendor/bin/doctrine orm:schema-tool:drop --force'
+* For update: `vendor/bin/doctrine orm:schema-tool:update --force --dump-sql`
 
 # Test
 
@@ -179,3 +205,5 @@ Demonization will occure on port 3000
 # Nginx
 
 Forvar admin.domain.org:80 to localhost:3000
+
+http://docs.doctrine-project.org/en/latest/tutorials/getting-started.html

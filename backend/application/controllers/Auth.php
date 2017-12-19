@@ -16,10 +16,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Auth extends REST_Controller 
 {	
+	private $dbHelper;
+	
+	public function __construct() { 
+		parent::__construct();
+		$this->dbHelper = new Dbhelper();
+	}
 	
 	public function index_get()
 	{
-		echo 'test';
+		print_r($this->dbHelper);
+		//echo $this->config->item('username', 'database'); 
 	}
 	
 	public function index_post()

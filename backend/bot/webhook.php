@@ -1,11 +1,13 @@
 <?php
 
-include('vendor/autoload.php'); //Подключаем библиотеку
+define("ROOT", dirname(__FILE__) . '/..');
+
+include(ROOT . '/vendor/autoload.php'); //Подключаем библиотеку
 
 use Telegram\Bot\Api;
 use Symfony\Component\Yaml\Yaml;
 
-$config = Yaml::parseFile('config.yml');
+$config = Yaml::parseFile(file_get_contents(ROOT . '/config.yml'));
 $telegram = new Api($config['token']);
 
 $result = $telegram->getWebhookUpdates();
