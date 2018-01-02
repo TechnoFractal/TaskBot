@@ -11,7 +11,7 @@ export default (type, params) => {
     // called when the user attempts to log in
     if (type === AUTH_LOGIN) {
         const { username, password } = params;
-		const request = new Request('http://koshkabot/api/auth', {
+		const request = new Request('/api/auth', {
             method: 'POST',
             body: JSON.stringify({
 				username: username, 

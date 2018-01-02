@@ -13,7 +13,7 @@ const App = () => (
 		authClient={authClient}
 		dashboard={Dashboard}
 		restClient={
-			jsonServerRestClient('http://koshkabot/api')
+			jsonServerRestClient('/api')
 		}>
 		<Resource 
 			icon={PostIcon}
