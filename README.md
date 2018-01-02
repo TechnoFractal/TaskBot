@@ -1,6 +1,122 @@
 > Powered by Koshka!
 
-# SSl
+# Environments configuration
+
+Further we will configure development environment for each developer  
+on his computer and several or one remote "on server/pre build" environments.  
+It can be for example - 4 developers environments, one remote for test and  
+on remote - main production environment.  
+Or it can be two developers environments and one remote production.  
+
+## Technologies
+
+On both we need:  
+
+* Debian based Linux destribution
+* Git
+* NodeJS
+* NodeJS module - react-scripts
+* Apache2
+* Apache2 module - curl
+* Apache2 module - mysql
+* Composer
+* MySQL
+* OpenSSL
+
+On development environment we need also `nginx`
+
+## @BotFather
+
+For **each environment** we need one Telegramm bot.  We will create it with  
+BotFather. 
+
+1. Find @BotFather applicative account in Telegramm.  
+2. Print:  /help
+3. /newbot
+4. Forward instructions
+5. Create token, and save it 
+
+You cat create tokens.txt at root of project and save there your tokens.  
+It is ignored by git.
+
+## Git
+
+Clone the project some where it can be accessable for Apache2 and Nginx
+
+## Composer
+
+Navigate to /path/to/project/backend forlder and run `composer install`
+
+## CodeIgniter
+
+Run from the root of project: `./installci.sh`
+
+Configure /ci/public/index.php  
+Find and adjust follow:  
+
+```
+$application_folder = '../../backend/application';
+$system_path = '../../backend/vendor/codeigniter/framework/system';
+```
+
+## DB
+
+Create database and user:
+
+```
+mysql -uroot -p
+create database telegrammbot;
+create user 'telegrammbot'@'localhost' identified by 'dbpassword';
+grant all privileges on telegrammbot.* to 'telegrammbot'@'localhost';
+flush privileges;
+```
+
+You can use user and password as you wish, just keep it same in DB/user  
+creation and bot configuration
+
+## Bot config
+
+Create config.yml in /backend/ folder and put:
+
+```
+token: "BOT_TOKEN"
+db:
+  user: "telegrammbot"
+  password: "dbpassword"
+```
+
+## DB schemas:
+
+Run at /backend:  
+* For create: `vendor/bin/doctrine orm:schema-tool:create`  
+* For drop: `vendor/bin/doctrine orm:schema-tool:drop --force'
+* For update: `vendor/bin/doctrine orm:schema-tool:update --force --dump-sql`
+
+# NodeJS Admin
+
+Install nodejs, and fix nodejs on Ubuntu after install:
+
+```
+sudo ln -s /usr/bin/nodejs /usr/local/bin/node
+```
+
+Install last npm:
+
+```
+sudo npm install -g n
+n latest
+```
+
+Install all necessary modules from /admin folder: `npm install`
+Than use follow commands:  
+
+1. `npm start` - For debug
+2. `npm run build` - For build
+3. `serve -s build` - For test of deploy package (optional)
+
+In case of `start` demonization will occure on port 3000
+
+## SSL Certificates
 
 Create some folder, for example /var/keys/ and run there:  
 
@@ -16,7 +132,12 @@ openssl req
 -subj "/C=RU/ST=Moscow/L=Pushkino/O=KoshkaSoft/CN=domain.org"
 ```
 
-Upload certificate and set callback:
+*IMPORTANT*! You need to set CN exactly as your domain name of the outer  
+callback for Telegramm.
+
+Perform follow (curl) step after you will achive all the goals described  
+below, and have all necessary data.  
+When you will have all the data, than: upload certificate and set callback:  
 
 ```
 curl \
@@ -25,11 +146,11 @@ curl \
 	https://api.telegram.org/bot<YOURTOKEN>/setWebhook
 ```
 
-# VHosts config
+## Apache2 hosts
 
-Set apache2 listen on port 8080 instead of 80
+### SSL configuration for TelegrammBot webhook (callback):
 
-## Bot host
+Create site in /etc/apache2/sites-available
 
 ```
 <IfModule mod_ssl.c>
@@ -37,19 +158,19 @@ Set apache2 listen on port 8080 instead of 80
 		ServerAdmin admin@domain.org
 		ServerName bot.domain.org
 		DocumentRoot /path/to/project/backend/bot
-
-		ErrorLog ${APACHE_LOG_DIR}/koshkabot.log
-		CustomLog ${APACHE_LOG_DIR}/koshkabot-access.log combined
-
+# -
+		ErrorLog ${APACHE_LOG_DIR}/talegrammbot.log
+		CustomLog ${APACHE_LOG_DIR}/talegrammbot-access.log combined
+# -
 		SSLEngine on
-
+# -
 		SSLCertificateFile	/var/keys/domain.pem
 		SSLCertificateKeyFile /var/keys/domain.key
-
+# -
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 				SSLOptions +StdEnvVars
 		</FilesMatch>
-
+# -
 		<Directory /path/to/project/backend/bot>
 			Options Indexes FollowSymLinks
 			AllowOverride All
@@ -59,25 +180,21 @@ Set apache2 listen on port 8080 instead of 80
 </IfModule>
 ```
 
-## Admin API backend
+### HTTP configuration for Admin and REST Admin api
 
-Host must be named: telegrammbotapi
-
-Add entry to /etc/hosts:
-
-```
-127.0.0.1	telegrammbotapi
-```
+Create configuration for api backend and admin site (see Alias)  
+with prebuild react js sources.  
+Here you need use appropriate port configured for the current environment.  
 
 ```
-<VirtualHost *:8080>
-	ServerName telegrammbotapi
-
+<VirtualHost *:[port]>
+	ServerName domain.org
+# -
 	ServerAdmin admin@domain.org
 	DocumentRoot /path/to/project/ci/public
-
+# -
 	Alias /admin /path/to/project/admin/build/
-
+# -
 	<Directory /path/to/project/ci/public>
 		AllowOverride all
 		Require all granted
@@ -90,71 +207,119 @@ Add entry to /etc/hosts:
 		AllowOverride all
 		Require all granted
 	</Directory>
-
+# -
 	ErrorLog ${APACHE_LOG_DIR}/botapi_error.log
 	CustomLog ${APACHE_LOG_DIR}/botapi_access.log combined
 </VirtualHost>
+``` 
+
+Enable it with `sudo a2ensite sitename`
+And reload apache `sudo service apache2 reload`
+
+_See substitutions for domain.org and bot.domain.org further._
+
+## Local development environment configuration
+
+### Assumptions:  
+
+Let:  
+* Outer ip: `7.98.98.10`
+* Outer HTTP port from outside for Telegramm to connect to the bot: `443`
+* Dynamic DNS name for remote connections: `telegrammbot.olga.ddns.net`
+* Inner ip: `192.168.0.100`
+* Inner router ip: `192.168.0.1`
+* Inner HTTP ports for apache to get connections: `8080` and `443`
+* Inner HTTP port for NodeJS: `3000`
+* Inner HTTP port for Nginx: `80`
+* Local server name for PHP admin REST service: `telegrammbotapi`
+* Local server name for NodeJS admin-on-rest compilation: `telegrammadmin`
+
+Substitutions for Apache2 servers in VHosts configurations:  
+
+* Apache2 SSL configuration: `bot.domain.org` -> `telegrammbot.olga.ddns.net`.
+* Apache2 HTTP configuration: `domain.org` -> `telegrammbotapi`
+
+### Port forwarding and dynamic DNS
+
+You need access your router admin panel at the web interface.  It is  
+represented by 192.168.0.1 in list above. For instance it can be:  
+`http://192.168.0.1`. Type it at your browser. Find password for admin  
+at box of the router or reset the settings and find the default password  
+in product description.
+There you need find "virtual server" or "port forwarding", but not port  
+triggering.  
+_google for "port forwarding"_  
+
+Configure (basing on assumptions above):  
+* Outer port (must be): 443
+* Inner port: 443
+* Inner ip: 192.168.0.100
+
+Than you need find option for dynamic DNS and configure it as well.  
+You will need to register on the DDNS service provider.  
+
+### /etc/hosts
+
+Append follow lines in /etc/hosts:  
 
 ```
-
-## Configure /ci/public/index.php find and adjust follow:  
-
-```
-$application_folder = '../../backend/application';
-$system_path = '../../backend/vendor/codeigniter/framework/system';
+127.0.0.1	telegrammbotadmin
+127.0.0.1	telegrammbotapi
 ```
 
-# Install dependencies
+### Nginx
+
+On the dev, you will need use nginx for both apache and nodejs will be on same  
+domain. Otherwise some browsers as Chromium will ose OPTIONS instead of  
+POST over the HTTP. 
+
+Configure site in /etc/nginx/sites-available and link it to  
+/etc/nginx/sites-enabled with `ln -s source destination` command  
 
 ```
-composer install
+map $http_upgrade $connection_upgrade {
+	default upgrade;
+	'' close;
+}
+# -
+upstream websocket {
+	server localhost:3000;
+}
+# -
+upstream api {
+	server telegrammbotapi:8080;
+}
+# -
+server {
+	listen 80;
+	server_name telegrammbotapi;
+# -
+	location / {
+		proxy_pass http://websocket;
+	}
+# -
+	proxy_http_version 1.1;
+	proxy_set_header Upgrade $http_upgrade;
+	proxy_set_header Connection $connection_upgrade;
+# -
+	location /api {
+		proxy_pass http://api;
+	}
+}
 ```
 
-# Codeigniter
+Restart the server:  `sudo service nginx restart`
 
-Run from the root of project:  
-```
-./installci.sh
-```
+### Apache2 ports reconfig
 
-# DB
+Set apache2 listen on port 8080 instead of 80 in `/etc/apache2/ports.conf`
+You will need restart apache2: `sudo service apache2 restart`
 
-```
-mysql -uroot -p
-create database telegrammbot;
-create user 'telegrammbot'@'localhost' identified by 'password';
-grant all privileges on telegrammbot.* to 'telegrammbot'@'localhost';
-flush privileges;
-```
+## Remote environment configuration
 
-Configure /backend/application/config/database.php
+TODO: to write
 
-# Configure web hook
-
-```
-curl \
-	-F "url=https://<YOURDOMAIN.EXAMPLE>/<WEBHOOKLOCATION>" \
-	-F "certificate=@<YOURCERTIFICATE>.pem" \
-	https://api.telegram.org/bot<YOURTOKEN>/setWebhook
-```
-
-# Config
-
-Create config.yml in /backend/ folder and put:
-
-```
-token: "BOT_TOKEN"
-db:
-  user: dbuser
-  password: bdpassword
-```
-
-Run at /backend:  
-* For create: `vendor/bin/doctrine orm:schema-tool:create`  
-* For drop: `vendor/bin/doctrine orm:schema-tool:drop --force'
-* For update: `vendor/bin/doctrine orm:schema-tool:update --force --dump-sql`
-
-# Test
+# Test the bot from command line
 
 ```
 curl \
@@ -185,25 +350,9 @@ curl \
 
 ```
 
-# Admin
+# Links
 
-```
-sudo npm install -g n
-n latest
-npm install pm2 -g
-cd admin
-npm install
-```
-
-1. `npm start` - For debug
-2. `npm run build` - For Build
-3. `serve -s build` - For test of deploy package
-4. `pm2 start app.js` - For demonize the deploy package
-
-Demonization will occure on port 3000
-
-# Nginx
-
-Forvar admin.domain.org:80 to localhost:3000
-
-http://docs.doctrine-project.org/en/latest/tutorials/getting-started.html
+* https://marmelab.com/admin-on-rest/
+* https://www.nginx.com/blog/websocket-nginx/
+* http://docs.doctrine-project.org/en/latest/tutorials/getting-started.html
+* https://reacttraining.com/react-router/web/example/basic

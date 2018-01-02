@@ -9,11 +9,11 @@ import UserIcon from 'material-ui/svg-icons/social/group';
 import Dashboard from './Dashboard';
 
 const App = () => (
-    <Admin 
+	<Admin 
 		authClient={authClient}
 		dashboard={Dashboard}
 		restClient={
-			jsonServerRestClient('http://telegrammbotapi:8080')
+			jsonServerRestClient('http://koshkabot/api')
 		}>
 		<Resource 
 			icon={PostIcon}
@@ -26,7 +26,7 @@ const App = () => (
 			icon={UserIcon}
 			name="users" 
 			list={UserList} />
-    </Admin>
+	</Admin>
 );
 
 export default App;

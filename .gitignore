@@ -1,12 +1,14 @@
 .LCK.gitignore~
 
+*.lock
+*lock.json
+
 /nbproject/private/
 /admin/node_modules/
 /admin/build/
 /admin/shared/
 /backend/vendor/
 /backend/config.yml
-
 /ci
-*.lock
-*lock.json
+
+/tokens.txt

@@ -7,10 +7,11 @@ import {
 	AUTH_CHECK } from 'admin-on-rest';
 
 export default (type, params) => {
+	//return Promise.resolve();
     // called when the user attempts to log in
     if (type === AUTH_LOGIN) {
         const { username, password } = params;
-		const request = new Request('http://telegrammbotapi:8080/auth', {
+		const request = new Request('http://koshkabot/api/auth', {
             method: 'POST',
             body: JSON.stringify({
 				username: username, 
