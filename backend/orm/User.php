@@ -2,6 +2,8 @@
 
 namespace orm;
 
+//use \Doctrine\ORM\Annotation as ORM;
+
 /**
  * @Entity @Table(name="users")
  **/
@@ -17,42 +19,62 @@ class User
      * @var string
 	 * @Column(type="string", unique=true)
      */
-    protected $name;
-	
-	/**
-     * var string
-	 * Column(type="string", unique=true)
-     */
-	//protected $test;
+    protected $login;
 	
 	/**
      * @var string
 	 * @Column(type="string")
      */
     protected $password;
+	
+	/**
+	 *
+	 * @var Session[]
+	 */
+	protected $sessions;
+	
+	public function __construct()
+    {
+        $this->sessions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+	
+	public function addSession(Session $session)
+    {
+        $this->sessions[] = $session;
+    }
+
+    public function assignedToSession(Session $session)
+    {
+        $this->sessions[] = $session;
+    }
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function getName()
+    public function getLogin()
     {
-        return $this->name;
+        return $this->login;
     }
 
-    public function setName($name)
+    public function setLogin($login)
     {
-        $this->name = $name;
+        $this->login = $login;
     }
 	
 	public function getPassword()
     {
-        return $this->name;
+        return $this->password;
     }
 
     public function setPassword($password)
     {
         $this->password = $password;
+    }
+	
+	public function getSessions() : array
+    {
+        return $this->sessions;
     }
 }

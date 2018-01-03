@@ -12,6 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 require_once(APPROOT . "/bootstrap.php");
 
 use orm\User;
+use orm\Session;
 
 /**
  * Description of Auth
@@ -20,24 +21,49 @@ use orm\User;
  */
 class Auth extends REST_Controller 
 {
-	private $orm;
+	/**
+	 *
+	 * @var DoctrineORM
+	 */
+	private $doctrine;
 	
 	public function __construct() {
 		parent::__construct();
-		$db = new DoctrineORM();
-		$this->orm = $db->getORM();
+		$this->doctrine = new DoctrineORM();
 	}
 	
 	public function index_get()
 	{
+		$orm = $this->doctrine->getORM();
+		
+		$user = $orm
+				->getRepository('orm\User')
+				->findOneBy(['login' => 'test']);
+		
+		if ($user) {
+			echo "deleting";
+			$orm->remove($user);
+			$orm->flush();
+		}
+		
 		$user = new User();
-		$user->setName("test2");
+		$user->setLogin("test");
 		$user->setPassword("123456");
 		
-		$this->orm->persist($user);
-		$this->orm->flush();
+		$session = new Session();
+		$session->setCreated(new DateTime('now'));
+		$session->setToken("qwe");
+		$session->setUser($user);
+		
+		$orm->persist($user);
+		$orm->persist($session);
+		$orm->flush();
+		
+		$user = $orm
+				->getRepository('orm\User')
+				->findOneBy(['login' => 'test']);
 
-		echo "Created user with ID " . $user->getId() . "\n";
+		echo "Password " . $user->getPassword() . "\n";
 		//print_r($this->dbHelper);
 		//echo $this->config->item('username', 'database'); 
 	}
