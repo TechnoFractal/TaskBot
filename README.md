@@ -400,3 +400,5 @@ curl \
 * https://www.nginx.com/blog/websocket-nginx/
 * http://docs.doctrine-project.org/en/latest/tutorials/getting-started.html
 * https://reacttraining.com/react-router/web/example/basic
+* https://code.tutsplus.com/tutorials/
+  working-with-restful-services-in-codeigniter--net-8814

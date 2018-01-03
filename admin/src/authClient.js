@@ -8,7 +8,7 @@ import {
 
 export default (type, params) => {
 	//return Promise.resolve();
-	console.log(type);
+	//console.log(type);
     // called when the user attempts to log in
     if (type === AUTH_LOGIN) {
         const { username, password } = params;

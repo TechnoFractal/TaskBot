@@ -25,8 +25,7 @@ class Authhook
 		}
 		
 		$token = $headers['token'];
-		$doctrine = new DoctrineORM();
-		$orm = $doctrine->getORM();
+		$orm = DoctrineORM::getORM();
 
 		$session = $orm
 				->getRepository('orm\Session')

@@ -20,7 +20,11 @@ import {
 const PostFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Search" source="q" alwaysOn />
-        <ReferenceInput label="User" source="userId" reference="users" allowEmpty>
+        <ReferenceInput 
+			label="User" 
+			source="userId" 
+			reference="users" 
+			allowEmpty>
             <SelectInput optionText="name" />
         </ReferenceInput>
     </Filter>
@@ -33,13 +37,20 @@ export const PostList = (props) => (
                 <SimpleList
                     primaryText={record => record.title}
                     secondaryText={record => `${record.views} views`}
-                    tertiaryText={record => new Date(record.published_at).toLocaleDateString()}
+                    tertiaryText={
+						record => 
+							new Date(record.published_at)
+									.toLocaleDateString()
+					}
                 />
             }
             medium={
                 <Datagrid>
                     <TextField source="id" />
-                    <ReferenceField label="User" source="userId" reference="users">
+                    <ReferenceField 
+						label="User" 
+						source="userId" 
+						reference="users">
                         <TextField source="name" />
                     </ReferenceField>
                     <TextField source="title" />

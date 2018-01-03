@@ -14,7 +14,8 @@ namespace orm;
  * @author olga
  * @Entity @Table(name="categories")
  */
-class Category {
+class Category 
+{
 	/**
      * @var int
 	 * @Id @Column(type="integer")

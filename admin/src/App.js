@@ -3,13 +3,15 @@ import {
 	simpleRestClient, 
 	fetchUtils, 
 	Admin, 
-	Resource 
+	Resource,
+	Delete
 } from 'admin-on-rest';
-import { Delete } from 'admin-on-rest';
-import { PostList, PostEdit, PostCreate } from './posts';
-import authClient from './authClient';
 import PostIcon from 'material-ui/svg-icons/action/book';
+import CategoryIcon from 'material-ui/svg-icons/action/assessment';
 import Dashboard from './Dashboard';
+import authClient from './authClient';
+import { CategoryList, CategoryEdit } from './categories';
+import { PostList, PostEdit, PostCreate } from './posts';
 
 const httpClient = (url, options = {}) => {
     if (!options.headers) {
@@ -33,9 +35,14 @@ const App = () => (
 			icon={PostIcon}
 			name="posts" 
 			list={PostList} 
-			edit={PostEdit} 
+			edit={PostEdit}
 			create={PostCreate}
 			remove={Delete} />
+		<Resource
+			icon={CategoryIcon}
+			name="categories" 
+			list={CategoryList}
+			edit={CategoryEdit} />
 	</Admin>
 );
 

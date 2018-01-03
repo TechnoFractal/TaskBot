@@ -34,6 +34,12 @@ class Post
      **/
     protected $created;
 
+	/**
+	 * @var string
+     * @Column(type="string")
+     **/
+    protected $title;
+	
     /**
 	 * @var string
      * @Column(type="string")
@@ -60,6 +66,16 @@ class Post
         return $this->created;
     }
 
+	public function setTitle(string $title)
+    {
+        $this->title = $title;
+    }
+
+    public function getTitle() : string
+    {
+        return $this->title;
+    }
+	
     public function setText(string $text)
     {
         $this->text = $text;

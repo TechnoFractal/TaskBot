@@ -7,14 +7,17 @@ use Symfony\Component\Yaml\Yaml;
 class DoctrineORM
 {
 	// Create a simple "default" Doctrine ORM configuration for Annotations
-	private $isDevMode = true;
-	private $entityManager;
+	const IS_DEV_MODE = true;
 	
-	public function __construct() 
+	/**
+	 * 
+	 * @return Doctrine\ORM\EntityManager
+	 */
+	public static function getORM() : Doctrine\ORM\EntityManager
 	{
 		$config = Setup::createAnnotationMetadataConfiguration(
 			[__DIR__ . "/orm"], 
-			$this->isDevMode
+			self::IS_DEV_MODE
 		);
 
 		$configPath = __DIR__ . '/config.yml';
@@ -24,22 +27,17 @@ class DoctrineORM
 		//print_r($config); die();
 
 		$dbParams = array(
-			'driver'   => $dbconfig["driver"],
-			'user'     => $dbconfig["user"],
-			'password' => $dbconfig["password"],
-			'dbname'   => $dbconfig["db"]
+			'driver'	=> $dbconfig["driver"],
+			'user'		=> $dbconfig["user"],
+			'password'	=> $dbconfig["password"],
+			'dbname'	=> $dbconfig["db"],
+			'charset'	=> 'UTF8',
+			'options'	=> [ 
+				1002 => "SET NAMES 'UTF8'"
+			]
 		);
 
 		// obtaining the entity manager
-		$this->entityManager = EntityManager::create($dbParams, $config);		
-	}
-	
-	/**
-	 * 
-	 * @return Doctrine\ORM\EntityManager
-	 */
-	public function getORM() : Doctrine\ORM\EntityManager
-	{
-		return $this->entityManager;
+		return EntityManager::create($dbParams, $config);
 	}
 }
