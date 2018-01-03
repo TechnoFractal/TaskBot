@@ -63,6 +63,13 @@ $application_folder = '../../backend/application';
 $system_path = '../../backend/vendor/codeigniter/framework/system';
 ```
 
+Configure /backend/application/config/config.php
+Find and adjust follow:  
+
+```
+$config['enable_hooks'] = TRUE;
+```
+
 ## DB
 
 Create database and user:

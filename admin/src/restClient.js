@@ -10,7 +10,7 @@ import {
 } from 'admin-on-rest';
 import { stringify } from 'query-string';
 
-const API_URL = 'talegrammbotapi:8080';
+const API_URL = '/api';
 
 /**
  * @param {String} type One of the constants appearing at 

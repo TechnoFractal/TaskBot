@@ -1,5 +1,10 @@
 import React from 'react';
-import { jsonServerRestClient, Admin, Resource } from 'admin-on-rest';
+import { 
+	jsonServerRestClient, 
+	fetchUtils, 
+	Admin, 
+	Resource 
+} from 'admin-on-rest';
 import { Delete } from 'admin-on-rest';
 import { PostList, PostEdit, PostCreate } from './posts';
 import { UserList } from './users';
@@ -8,13 +13,24 @@ import PostIcon from 'material-ui/svg-icons/action/book';
 import UserIcon from 'material-ui/svg-icons/social/group';
 import Dashboard from './Dashboard';
 
+const httpClient = (url, options = {}) => {
+    if (!options.headers) {
+        options.headers = new Headers({ Accept: 'application/json' });
+    }
+	
+    const token = localStorage.getItem('token');
+    options.headers.set('token', `${token}`);
+    
+	return fetchUtils.fetchJson(url, options);
+}
+
+const restClient = jsonServerRestClient('/api', httpClient);
+
 const App = () => (
 	<Admin 
 		authClient={authClient}
-		dashboard={Dashboard}
-		restClient={
-			jsonServerRestClient('/api')
-		}>
+		restClient={restClient}		
+		dashboard={Dashboard}>
 		<Resource 
 			icon={PostIcon}
 			name="posts" 
@@ -22,11 +38,12 @@ const App = () => (
 			edit={PostEdit} 
 			create={PostCreate}
 			remove={Delete} />
-		<Resource 
-			icon={UserIcon}
-			name="users" 
-			list={UserList} />
 	</Admin>
 );
+
+//<Resource 
+//			icon={UserIcon}
+//			name="users" 
+//			list={UserList} />
 
 export default App;
