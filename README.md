@@ -19,7 +19,11 @@ On both we need:
 * Apache2
 * Apache2 module - curl
 * Apache2 module - mysql
+* PHP 7.*
 * Composer
+* Doctrine
+* CodeIgniter
+* CodeIgniterRestServer
 * MySQL
 * OpenSSL
 
@@ -83,7 +87,14 @@ token: "BOT_TOKEN"
 db:
   user: "telegrammbot"
   password: "dbpassword"
+  db: "telegrammbot"
+  driver: "pdo_mysql"
 ```
+
+The driver part is mostly problematic one. You need make your php installation  
+support `pdo_msql` driver or any other.
+`<? echo phpinfo();` integrated in outside page will help you to reach this  
+goal.
 
 ## DB schemas:
 

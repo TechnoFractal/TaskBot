@@ -1,5 +1,7 @@
 <?php
 
+namespace orm;
+
 /**
  * @Entity @Table(name="users")
  **/
@@ -13,9 +15,15 @@ class User
     
 	/**
      * @var string
-	 * @Column(type="string")
+	 * @Column(type="string", unique=true)
      */
     protected $name;
+	
+	/**
+     * var string
+	 * Column(type="string", unique=true)
+     */
+	//protected $test;
 	
 	/**
      * @var string

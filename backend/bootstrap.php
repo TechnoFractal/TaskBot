@@ -2,26 +2,44 @@
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Yaml\Yaml;
 
-require_once "vendor/autoload.php";
+class DoctrineORM
+{
+	// Create a simple "default" Doctrine ORM configuration for Annotations
+	private $isDevMode = true;
+	private $entityManager;
+	
+	public function __construct() 
+	{
+		$config = Setup::createAnnotationMetadataConfiguration(
+			[__DIR__ . "/orm"], 
+			$this->isDevMode
+		);
 
-// Create a simple "default" Doctrine ORM configuration for Annotations
-$isDevMode = true;
-$config = Setup::createAnnotationMetadataConfiguration(
-	[__DIR__ . "/orm"], 
-	$isDevMode
-);
+		$configPath = __DIR__ . '/config.yml';
+		$dbconfig = Yaml::parse(file_get_contents($configPath))["db"];
 
-//var_dump($config); die();
+		//print_r($dbconfig); die();
+		//print_r($config); die();
 
-$dbParams = array(
-    'driver'   => 'pdo_mysql',
-    'user'     => 'telegrammbot',
-    'password' => '123456',
-    'dbname'   => 'telegrammbot'
-);
+		$dbParams = array(
+			'driver'   => $dbconfig["driver"],
+			'user'     => $dbconfig["user"],
+			'password' => $dbconfig["password"],
+			'dbname'   => $dbconfig["db"]
+		);
 
-// obtaining the entity manager
-$entityManager = EntityManager::create($dbParams, $config);
-
-//var_dump($entityManager); die();
+		// obtaining the entity manager
+		$this->entityManager = EntityManager::create($dbParams, $config);		
+	}
+	
+	/**
+	 * 
+	 * @return Doctrine\ORM\EntityManager
+	 */
+	public function getORM() : Doctrine\ORM\EntityManager
+	{
+		return $this->entityManager;
+	}
+}

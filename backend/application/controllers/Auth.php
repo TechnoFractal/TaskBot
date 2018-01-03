@@ -9,29 +9,44 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+require_once(APPROOT . "/bootstrap.php");
+
+use orm\User;
+
 /**
  * Description of Auth
  *
  * @author olga
  */
 class Auth extends REST_Controller 
-{	
-	private $dbHelper;
+{
+	private $orm;
 	
-	public function __construct() { 
+	public function __construct() {
 		parent::__construct();
-		$this->dbHelper = new Dbhelper();
+		$db = new DoctrineORM();
+		$this->orm = $db->getORM();
 	}
 	
 	public function index_get()
 	{
-		print_r($this->dbHelper);
+		$user = new User();
+		$user->setName("test2");
+		$user->setPassword("123456");
+		
+		$this->orm->persist($user);
+		$this->orm->flush();
+
+		echo "Created user with ID " . $user->getId() . "\n";
+		//print_r($this->dbHelper);
 		//echo $this->config->item('username', 'database'); 
 	}
 	
 	public function index_post()
     {
 		//error_log($_REQUEST);
+		$user = $this->post('username');
+		$password = $this->post('password');
 		
         // $this->some_model->update_user( ... );
         $message = [

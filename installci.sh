@@ -11,7 +11,7 @@ cp application/config/memcached.php ../backend/application/config/
 cp application/config/foreign_chars.php ../backend/application/config/
 cp application/config/doctypes.php ../backend/application/config/
 cp application/config/database.php ../backend/application/config/
-cp application/config/constants.php ../backend/application/config/
+#cp application/config/constants.php ../backend/application/config/
 cp application/config/profiler.php ../backend/application/config/
 cp application/config/config.php ../backend/application/config/
 rm composer.*

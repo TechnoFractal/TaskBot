@@ -4,6 +4,7 @@
 !/logs/index.html
 /config/*
 !/config/autoload.php
+!/config/constants.php
 !/config/hooks.php
 !/config/routes.php
 !/config/index.html
