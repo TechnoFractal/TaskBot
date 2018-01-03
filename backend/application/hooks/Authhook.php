@@ -12,7 +12,7 @@ class Authhook
 		$router =& load_class('Router', 'core');
         $controller = $router->fetch_class();
 
-        if($controller == 'auth')
+        if($controller == 'auth' || $controller == 'main')
         {
 			return true;
 		}

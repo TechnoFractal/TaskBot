@@ -9,24 +9,24 @@
 namespace orm;
 
 /**
- * Description of Session
+ * Description of Post
  *
  * @author olga
- * @Entity @Table(name="sessions")
- **/
-class Session 
+ * @Entity @Table(name="posts")
+ */
+class Post 
 {
 	/**
      * @var int
 	 * @Id @Column(type="integer") @GeneratedValue
      */
     protected $id;
-	
+
 	/**
-     * @var User
-	 * @ManyToOne(targetEntity="User", inversedBy="sessions")
+     * @var Category
+	 * @ManyToOne(targetEntity="Category", inversedBy="categories")
      **/
-    protected $user;
+    protected $category;
 	
 	/**
 	 * @var \DateTime
@@ -38,17 +38,16 @@ class Session
 	 * @var string
      * @Column(type="string")
      **/
-    protected $token;
+    protected $text;
 	
-	public function setUser(User $user)
+	public function setCategory(Category $category)
     {
-        $user->assignedToSession($this);
-        $this->user = $user;
+        $this->category = $category;
     }
 	
-	public function getUser() : User
+	public function getCategory() : Category
 	{
-		return $this->user;
+		return $this->category;
 	}
 	
     public function setCreated(\DateTime $created)
@@ -61,13 +60,13 @@ class Session
         return $this->created;
     }
 
-    public function setToken(string $token)
+    public function setText(string $text)
     {
-        $this->token = $token;
+        $this->text = $text;
     }
 
-    public function getToken() : string
+    public function getText() : string
     {
-        return $this->token;
+        return $this->text;
     }
 }

@@ -105,10 +105,35 @@ goal.
 
 ## DB schemas:
 
+### Create schema
+
 Run at /backend:  
 * For create: `vendor/bin/doctrine orm:schema-tool:create`  
-* For drop: `vendor/bin/doctrine orm:schema-tool:drop --force'
-* For update: `vendor/bin/doctrine orm:schema-tool:update --force --dump-sql`
+* For drop: `vendor/bin/doctrine orm:schema-tool:drop'
+* For update: `vendor/bin/doctrine orm:schema-tool:update`
+
+You need add `--dump-sql` for print the query or `--force` for run the query.  
+
+### Deploy schema with data if it created from scratch  
+
+* Navigate to `/backend/db/` and run `mysql -u user -p`  
+* Enter the password
+
+```
+use dbname
+source script.sql
+```
+
+Create account for admin:  
+
+```
+desc users;
+insert into users(`login`, `password`) values ("username", "password");
+select * from users;
+```
+
+_You need choose username and password_ It is credential data for login from  
+Admin-On-Rest admin panel.
 
 # NodeJS Admin
 

@@ -20,6 +20,6 @@ class Main extends CI_Controller {
 	 */
 	public function index()
 	{
-		//error_log('test');
+		echo "TelegrammBotAPI";
 	}
 }
