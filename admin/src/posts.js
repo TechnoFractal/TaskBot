@@ -42,7 +42,6 @@ export const PostList = (props) => (
 			</ReferenceField>
 			<DateField source="created" />	
 			<TextField source="title" />
-			<TextField source="text" />
 			<EditButton />
 		</Datagrid>
     </List>
@@ -58,7 +57,10 @@ export const PostEdit = (props) => (
             <DisabledInput source="id" />
 			<DateInput 
 				label="Publication date" 
-				source="created"/>
+				source="created"
+				locales="ru-RU"		
+				showTime
+				/>
             <ReferenceInput 
 				label="Category" 
 				source="categoryId" 

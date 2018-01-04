@@ -7,7 +7,7 @@ namespace orm;
 /**
  * @Entity @Table(name="users")
  **/
-class User
+class User implements Restable
 {
     /**
      * @var int
@@ -77,4 +77,12 @@ class User
     {
         return $this->sessions;
     }
+
+	public function toResult(): array {
+		return [
+			'id' => $this->getId(),
+			'login' => $this->getLogin(),
+			'password' => $this->getPassword()
+		];
+	}
 }

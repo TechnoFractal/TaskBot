@@ -14,7 +14,7 @@ namespace orm;
  * @author olga
  * @Entity @Table(name="categories")
  */
-class Category 
+class Category implements Restable
 {
 	/**
      * @var int
@@ -47,4 +47,12 @@ class Category
 	{
 		$this->title = $title;
 	}
+
+	public function toResult(): array {
+		return [
+			'id' => $this->getId(),
+			'title' => $this->getTitle()
+		];
+	}
+
 }

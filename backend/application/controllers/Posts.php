@@ -2,8 +2,6 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-use Doctrine\Common\Collections\Criteria;
-
 /**
  * Description of Posts
  *
@@ -11,6 +9,73 @@ use Doctrine\Common\Collections\Criteria;
  */
 class Posts extends REST_Controller 
 {
+	public function index_delete(int $id)
+	{		
+		$orm = DoctrineORM::getORM();
+
+		/* @var $post orm\Post */
+		$post = $orm
+				->getRepository(orm\Post::class)
+				->find($id);
+
+		if ($post) {
+			$result = $post->toResult();
+			$orm->remove($post);
+			$orm->flush();
+			
+			$this->set_response($result, REST_Controller::HTTP_OK);
+		} else {
+			$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
+		}
+		
+	}
+	
+	public function index_put($id)
+	{		
+		$categoryId = $this->put("categoryId");
+		$title = $this->put("title");
+		$text = $this->put("text");
+		$created = $this->put("created");
+		
+		if (!$title || 
+			!$categoryId ||
+			!$created ||
+			!$text)
+		{
+			$this->set_response(null, REST_Controller::HTTP_NOT_ACCEPTABLE);
+			return;
+		}
+		
+		$orm = DoctrineORM::getORM();
+			
+		/* @var $post orm\Post */
+		$post = $orm
+			->getRepository(orm\Post::class)
+			->find($id);
+		
+		/* @var $category orm\Category */
+		$category = $orm
+			->getRepository(orm\Category::class)
+			->find($categoryId);
+			
+		if (!$category || !$post)
+		{
+			$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
+			return;
+		}
+
+		$post->setTitle($title);
+		$post->setCategory($category);
+		$post->setText($text);
+		$post->setCreated(new DateTime($created));
+		
+		$orm->flush();
+		
+		$result = $post->toResult();
+		
+		$this->set_response($result, REST_Controller::HTTP_OK);
+	}
+
 	public function index_post()
 	{
 		$title = $this->post("title");
@@ -20,6 +85,7 @@ class Posts extends REST_Controller
 		if (!$title || !$categoryId || !$text)
 		{
 			$this->set_response(null, REST_Controller::HTTP_NOT_ACCEPTABLE);
+			return;
 		}
 		
 		$orm = DoctrineORM::getORM();
@@ -31,6 +97,7 @@ class Posts extends REST_Controller
 		if (!$categoryId)
 		{
 			$this->set_response(null, REST_Controller::HTTP_NOT_ACCEPTABLE);
+			return;
 		}
 		
 		$post = new orm\Post();
@@ -44,13 +111,7 @@ class Posts extends REST_Controller
 		
 		$id = $post->getId();
 		
-		$result = [
-			'id' => $id,
-			'title' => $post->getTitle(),
-			'text' => $post->getText(),
-			'created' => $post->getCreated(),
-			'categoryId' => $post->getCategory()->getId()
-		];
+		$result = $post->toResult();
 		
 		$respHeader = "Location: /posts/$id";
 			
@@ -68,23 +129,18 @@ class Posts extends REST_Controller
 		{
 			/* @var $category orm\Post */
 			$post = $orm
-				->getRepository('orm\Post')
+				->getRepository(orm\Post::class)
 				->find($id);
 			
 			$result = [];
 			
 			if ($post)
 			{
-				$result = [
-					'id' => $post->getId(),
-					'title' => $post->getTitle(),
-					'categoryId' => $post->getCategory()->getId(),
-					'text' => $post->getText(),
-					'created' => $post->getCreated()->format('Y-m-d')
-				];
-			}
-			
-			$this->set_response($result, REST_Controller::HTTP_OK);			
+				$result = $post->toResult();
+				$this->set_response($result, REST_Controller::HTTP_OK);
+			} else {
+				$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
+			}	
 		} else {
 			$sort = (array)json_decode($this->get("sort"), true);
 			$range = (array)json_decode($this->get("range"), true);
@@ -104,13 +160,7 @@ class Posts extends REST_Controller
 			/* @var $post orm\Post */
 			foreach ($posts as $post)
 			{
-				$result[] = [
-					'id' => $post->getId(),
-					'categoryId' => $post->getCategory()->getId(),
-					'created' => $post->getCreated()->format('Y-m-d'),
-					'title' => $post->getTitle(),
-					'text' => $post->getText()
-				];
+				$result[] = $post->toResult();
 			}
 			
 			$this->output->set_header($respHeader);

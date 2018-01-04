@@ -26,7 +26,7 @@ class Auth extends REST_Controller
 			$orm = DoctrineORM::getORM();
 		
 			$session = $orm
-					->getRepository('orm\Session')
+					->getRepository(orm\Session::class)
 					->findOneBy(['token' => $token]);
 
 			if ($session) {
@@ -51,11 +51,17 @@ class Auth extends REST_Controller
 		$login = $this->post('username');
 		$password = $this->post('password');
 		
-		$orm = $this->doctrine->getORM();
+		if (!$login || !$password)
+		{
+			$this->set_response(null, REST_Controller::HTTP_BAD_REQUEST);
+			return;
+		}
+		
+		$orm = DoctrineORM::getORM();
 		
 		/* @var $user User */
 		$user = $orm
-				->getRepository('orm\User')
+				->getRepository(orm\User::class)
 				->findOneBy(['login' => $login]);
 		
 		if ($user && $user->getPassword() == $password) 

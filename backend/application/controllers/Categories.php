@@ -20,8 +20,6 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-use Doctrine\Common\Collections\Criteria;
-
 /**
  * Description of Categories
  *
@@ -29,10 +27,13 @@ use Doctrine\Common\Collections\Criteria;
  */
 class Categories extends REST_Controller 
 {
-	public function index_put($id = null)
+	public function index_put($id)
 	{		
-		if (!$id)
+		$title = $this->put("title");
+		
+		if (!$title)
 		{
+			$this->set_response(null, REST_Controller::HTTP_NOT_ACCEPTABLE);
 			return;
 		}
 		
@@ -40,28 +41,19 @@ class Categories extends REST_Controller
 			
 		/* @var $category orm\Category */
 		$category = $orm
-			->getRepository('orm\Category')
+			->getRepository(orm\Category::class)
 			->find($id);
 			
 		if (!$category)
 		{
-			return;
-		}
-		
-		$title = $this->put("title");
-		
-		if (!$title)
-		{
+			$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
 			return;
 		}
 		
 		$category->setTitle($title);
 		$orm->flush();
 		
-		$result = [
-			'id' => $category->getId(),
-			'title' => $category->getTitle()
-		];
+		$result = $category->toResult();
 		
 		$this->set_response($result, REST_Controller::HTTP_OK);
 	}
@@ -74,20 +66,18 @@ class Categories extends REST_Controller
 		{
 			/* @var $category orm\Category */
 			$category = $orm
-				->getRepository('orm\Category')
+				->getRepository(orm\Category::class)
 				->find($id);
 			
 			$result = [];
 			
 			if ($category)
 			{
-				$result = [
-					'id' => $category->getId(),
-					'title' => $category->getTitle()
-				];
+				$result = $category->toResult();
+				$this->set_response($result, REST_Controller::HTTP_OK);
+			} else {
+				$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
 			}
-			
-			$this->set_response($result, REST_Controller::HTTP_OK);
 		} else {
 			$sort = (array)json_decode($this->get("sort"), true);
 			$range = (array)json_decode($this->get("range"), true);
@@ -107,10 +97,7 @@ class Categories extends REST_Controller
 			/* @var $category orm\Category */
 			foreach ($categories as $category)
 			{
-				$result[] = [
-					'id' => $category->getId(),
-					'title' => $category->getTitle()
-				];
+				$result[] = $category->toResult();
 			}
 			
 			$this->output->set_header($respHeader);

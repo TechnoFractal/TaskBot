@@ -14,7 +14,7 @@ namespace orm;
  * @author olga
  * @Entity @Table(name="posts")
  */
-class Post 
+class Post implements Restable
 {
 	/**
      * @var int
@@ -90,4 +90,14 @@ class Post
     {
         return $this->text;
     }
+
+	public function toResult(): array {
+		return [
+			'id' => $this->getId(),
+			'title' => $this->getTitle(),
+			'text' => $this->getText(),
+			'created' => $this->getCreated()->format('Y-m-d'),
+			'categoryId' => $this->getCategory()->getId()
+		];	
+	}
 }

@@ -14,7 +14,7 @@ namespace orm;
  * @author olga
  * @Entity @Table(name="sessions")
  **/
-class Session 
+class Session implements Restable
 {
 	/**
      * @var int
@@ -39,6 +39,11 @@ class Session
      * @Column(type="string")
      **/
     protected $token;
+	
+	public function getId() : int
+	{
+		return $this->id;
+	}
 	
 	public function setUser(User $user)
     {
@@ -70,4 +75,13 @@ class Session
     {
         return $this->token;
     }
+
+	public function toResult(): array {
+		return [
+			'id' => $this->getId(),
+			'token' => $this->getToken(),
+			'userId' => $this->getUser()->getId(),
+			'created' => $this->getCreated()->format('Y-m-d')
+		];
+	}
 }
