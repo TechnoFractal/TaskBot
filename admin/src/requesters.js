@@ -11,13 +11,24 @@ import {
 export const RequesterList = (props) => (
     <List {...props}>
 		<Datagrid>
-			<TextField source="tele_id" />
-			<BooleanField source="is_bot" />
-			<TextField source="tele_id" />
-			<TextField source="first_name" />
-			<TextField source="last_name" />
-			<TextField source="user_name" />
-			<DateField source="created" />	
+			<TextField 
+				label="Category" 
+				source="teleId" />
+			<BooleanField 
+				label="Is bot?"
+				source="isBot" />
+			<TextField 
+				label="First Name"
+				source="firstName" />
+			<TextField 
+				label="Last Name"
+				source="lastName" />
+			<TextField 
+				label="User Name"
+				source="userName" />
+			<DateField 
+				label="Requsted at"
+				source="accessDate" />	
 			<ReferenceField 
 				label="Category" 
 				source="categoryId" 

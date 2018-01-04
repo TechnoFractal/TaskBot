@@ -28,7 +28,7 @@ namespace orm;
  * @Table(
  *	name="requesters",
  *	uniqueConstraints={
- *		@UniqueConstraint(columns={"post_id", "category_id", "tele_id"})
+ *		@UniqueConstraint(columns={"category_id", "tele_id"})
  *	}
  * )
  */
@@ -78,13 +78,13 @@ class Requester implements Restable
 	
 	/**
      * @var Post
-	 * @ManyToOne(targetEntity="Post", inversedBy="posts")
+	 * @OneToOne(targetEntity="Post")
      **/
     protected $post;
 	
 	/**
      * @var Category
-	 * @ManyToOne(targetEntity="Category", inversedBy="categories")
+	 * @OneToOne(targetEntity="Category")
      **/
     protected $category;
 	
@@ -182,7 +182,7 @@ class Requester implements Restable
 			'firstName' => $this->getFirstName(),
 			'lastName' => $this->getLastName(),
 			'userName' => $this->getUserName(),
-			'accessDate' => $this->getDate(),
+			'accessDate' => $this->getDate()->format("Y-m-d"),
 			'categoryId' => $this->getCategory()->getId(),
 			'postId' => $this->getPost()->getId()
 		];

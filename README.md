@@ -85,17 +85,6 @@ flush privileges;
 You can use user and password as you wish, just keep it same in DB/user  
 creation and bot configuration
 
-### Configure MySQL use UTF-8:
-
-Locate `/etc/mysql/conf.d/mysql.cnf`  
-Put there:  
-
-```
-[mysql]
-character-set-server=utf8
-collation-server=utf8_general_ci
-```
-
 ## Bot config
 
 Create config.yml in /backend/ folder and put:
@@ -438,6 +427,22 @@ curl \
 
 ```
 
+# Important info
+
+When you will create text will be used by the bot, put it in 
+`/backend/bot/data` directory. There you can split lines by CRLF, but it will  
+joined by the application.
+For put new line (as <br/>) use - "\r".  
+You also can use templates.  
+For instance:  
+
+```
+<b>Some header<b>\r
+Some text
+will not split here\nbut here!\n
+Good evening: {name}
+```
+
 # Links
 
 * https://marmelab.com/admin-on-rest/
@@ -446,3 +451,5 @@ curl \
 * https://reacttraining.com/react-router/web/example/basic
 * https://code.tutsplus.com/tutorials/
   working-with-restful-services-in-codeigniter--net-8814
+* https://core.telegram.org/bots/api
+* https://telegram-bot-sdk.readme.io/docs

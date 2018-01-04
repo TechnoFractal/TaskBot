@@ -55,4 +55,8 @@ class Category implements Restable
 		];
 	}
 
+	public function __toString() 
+	{
+		return $this->getId() . ": " . $this->getTitle();
+	}
 }

@@ -21,6 +21,8 @@
 namespace bot;
 
 use \Telegram\Bot\Api;
+use \Telegram\Bot\Objects\Message;
+use \Telegram\Bot\Objects\Update;
 
 /**
  * Description of KoshkaBot
@@ -31,45 +33,37 @@ class KoshkaBot
 {
 	public function handleRequest(Api $api) : bool
 	{
+		/* @var $result Update */
 		$result = $api->getWebhookUpdates();
 		
-		if (!isset($result["message"]))
+		/* @var $result Message */
+		$message = $result->getMessage();
+		
+		if (!$message)
 		{
+			error_log("Invalid request");
 			return false;
 		}
-
+		
 		//Текст сообщения
-		$text = $result["message"]["text"];
+		$text = $message->getText();
 		//Уникальный идентификатор пользователя
-		$chat_id = $result["message"]["chat"]["id"];
-		$id = $result["message"]["from"]["id"];
-		$firstName = $result["message"]["from"]["first_name"];
+		$chat_id = $message->getChat()->getId();
 		
-		$lastName = "";
 		
-		if (isset($result["message"]["from"]["last_name"]))
-		{
-			$lastName = $result["message"]["from"]["last_name"];
-		}
-		
-		$username = "";
-		
-		if (isset($result["message"]["from"]["username"]))
-		{
-			$username = $result["message"]["from"]["username"];
-		}
-		
-		$isBot = $result["message"]["from"]["is_bot"];
+		//error_log($text); die();
 		
 		//Клавиатура
 		$keyboard = [
-			["Легкие задания"],
-			["Средние задания"],
-			["Сложные задания"],
-			["Инфа"],
-			["Связь"]
+			[TasksQueue::LIGHT_TASKS],
+			[TasksQueue::MIDDLE_TASKS],
+			[TasksQueue::HARD_TASKS],
+			[TasksQueue::INFO],
+			[TasksQueue::CONTACT]
 		];
 
+		//error_log('here');
+		
 		if($text) {
 			 if ($text == "/start") {
 				$reply = "Добро пожаловать в АнтиБот!";
@@ -84,21 +78,33 @@ class KoshkaBot
 					'text' => $reply, 
 					'reply_markup' => $reply_markup 
 				]);
-			} elseif ($text == "/help") {
-				$reply = "Слава Котам!!!";
+			} elseif ($text == "/help" || $text == TasksQueue::INFO) {
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
-					'text' => $reply 
+					'parse_mode' => 'HTML',
+					'text' => TasksQueue::getInfo()
 				]);
-			} elseif ($text == "Кошке нужна валерьянка") {
-				$api->sendSticker([ 
+			} elseif ($text == TasksQueue::CONTACT) {
+				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
-					'sticker' => 'CAADBAADxgMAAv4zDQY6bEeD67rtlAI'
+					'parse_mode' => 'HTML',
+					'text' => TasksQueue::getContacts()
 				]);
-			} elseif ($text == "Мишка )") {
-				$api->sendSticker([ 
+			} else if (
+				$text == TasksQueue::LIGHT_TASKS ||
+				$text == TasksQueue::MIDDLE_TASKS ||
+				$text == TasksQueue::HARD_TASKS) {
+				$tasksQueue = new TasksQueue();
+				
+				//error_log(print_r($result["message"], 1)); die();
+				
+				$requesterData = new RequesterData($message->getFrom());
+				//error_log("here1"); die();
+				
+				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
-					'sticker' => 'CAADAgADnQQAAmvEygrzEw25pNCS5wI'
+					'parse_mode' => 'HTML',
+					'text' => $tasksQueue->handleRequest($text, $requesterData)
 				]);
 			} else {
 				$reply = "По запросу \"<b>".$text."</b>\" ничего не найдено.";
