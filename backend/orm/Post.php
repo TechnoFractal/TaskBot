@@ -46,6 +46,11 @@ class Post
      **/
     protected $text;
 	
+	public function getId() : int
+	{
+		return $this->id;
+	}
+	
 	public function setCategory(Category $category)
     {
         $this->category = $category;

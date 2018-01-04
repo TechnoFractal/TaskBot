@@ -29,32 +29,78 @@ use Doctrine\Common\Collections\Criteria;
  */
 class Categories extends REST_Controller 
 {
+	public function index_put($id = null)
+	{		
+		if (!$id)
+		{
+			return;
+		}
+		
+		$orm = DoctrineORM::getORM();
+			
+		/* @var $category orm\Category */
+		$category = $orm
+			->getRepository('orm\Category')
+			->find($id);
+			
+		if (!$category)
+		{
+			return;
+		}
+		
+		$title = $this->put("title");
+		
+		if (!$title)
+		{
+			return;
+		}
+		
+		$category->setTitle($title);
+		$orm->flush();
+		
+		$result = [
+			'id' => $category->getId(),
+			'title' => $category->getTitle()
+		];
+		
+		$this->set_response($result, REST_Controller::HTTP_OK);
+	}
+
 	public function index_get($id = null)
 	{
 		$orm = DoctrineORM::getORM();
 		
 		if ($id)
 		{
+			/* @var $category orm\Category */
+			$category = $orm
+				->getRepository('orm\Category')
+				->find($id);
 			
+			$result = [];
+			
+			if ($category)
+			{
+				$result = [
+					'id' => $category->getId(),
+					'title' => $category->getTitle()
+				];
+			}
+			
+			$this->set_response($result, REST_Controller::HTTP_OK);
 		} else {
-			$sort = json_decode($this->get("sort"));
-			$range = json_decode($this->get("range"));
-			$from = $range[0];
-			$to = $range[1];
-			$sortBy = $sort[0];
-			$sortOrder = $sort[1];
-			$sorting = [$sortBy => $sortOrder];
+			$sort = (array)json_decode($this->get("sort"), true);
+			$range = (array)json_decode($this->get("range"), true);
+			$filter = (array)json_decode($this->get("filter"), true);
 			
-			//print_r($sort);print_r($range); die();
+			//print_r($filter); die();
 			
-			$repo = $orm->getRepository('orm\Category');
+			$repo = $orm->getRepository(orm\Category::class);
+			$resp = Telecriteria::getCriteria($sort, $range, $filter, $repo);
 			
-			$criteria = Criteria::create()
-				->orderBy($sorting)
-				->setFirstResult($from)
-				->setMaxResults($to - $from);
-
-			$categories = $repo->matching($criteria)->toArray();
+			$categories = $resp[0];
+			$suffix = $resp[1];
+			$respHeader = "Content-Range: posts $suffix";
 			
 			$result = [];
 			
@@ -66,11 +112,6 @@ class Categories extends REST_Controller
 					'title' => $category->getTitle()
 				];
 			}
-			
-			$count = count($result);
-			$respHeader = "Content-Range: posts $from-$to/$count";
-			
-			//print_r((array)$result); die();
 			
 			$this->output->set_header($respHeader);
 			$this->set_response($result, REST_Controller::HTTP_OK);

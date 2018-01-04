@@ -19,13 +19,58 @@
  */
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * Description of TeleCategory
  *
  * @author Olga Pshenichnikova <olga@technofractal.org>
  */
-class Telecategory 
+class Telecriteria
 {
+	public static function getCriteria(
+		array $sort, 
+		array $range, 
+		array $filter,
+		EntityRepository $repo
+	) : array
+	{		
+		/* @var $criteria Criteria */
+		$criteria = Criteria::create();
+		
+		$from = 0;
+		
+		if ($range)
+		{
+			$from = $range[0];
+			$to = $range[1];
+			$criteria
+				->setFirstResult($from)
+				->setMaxResults($to - $from);
+		}
 	
+		if ($filter)
+		{
+			//$criteria->where(Criteria::expr()->eq("birthday", "1982-02-17"));
+		}
+		
+		if ($sort)
+		{
+			$sortBy = $sort[0];
+			$sortOrder = $sort[1];
+			$sorting = [$sortBy => $sortOrder];
+			$criteria->orderBy($sorting);
+		}
+		
+		$resp = $repo->matching($criteria)->toArray();
+		$count = count($resp);
+		$to = $from + $count;
+		
+		$suffix = "$from-$to/$count";
+		
+		return [
+			$resp,
+			$suffix
+		];
+	}
 }

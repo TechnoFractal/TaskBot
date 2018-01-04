@@ -24,7 +24,8 @@ import {
 	Edit,
 	SimpleForm,
 	DisabledInput,
-	TextInput
+	TextInput,
+	EditButton
 } from 'admin-on-rest';
 
 export const CategoryList = (props) => (
@@ -32,6 +33,7 @@ export const CategoryList = (props) => (
         <Datagrid>
             <TextField source="id" />
             <TextField source="title" />
+			<EditButton />
         </Datagrid>
     </List>
 );

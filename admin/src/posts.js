@@ -3,62 +3,48 @@ import {
 	Filter,
 	List, 
 	Edit, 
-	Create, 
-	Responsive, 
-	SimpleList, 
+	Create,
 	Datagrid, 
 	ReferenceField, 
-	TextField, 
+	TextField,
+	DateField,
 	EditButton, 
 	DisabledInput, 
 	LongTextInput, 
 	ReferenceInput, 
 	SelectInput, 
 	SimpleForm, 
-	TextInput } from 'admin-on-rest';
+	TextInput,
+	DateInput,
+	RadioButtonGroupInput} from 'admin-on-rest';
 
 const PostFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Search" source="q" alwaysOn />
         <ReferenceInput 
-			label="User" 
-			source="userId" 
-			reference="users" 
-			allowEmpty>
-            <SelectInput optionText="name" />
+			label="Category" 
+			source="categoryId" 
+			reference="categories">
+            <SelectInput optionText="title" />
         </ReferenceInput>
     </Filter>
 );
 
 export const PostList = (props) => (
     <List {...props}>
-        <Responsive
-            small={
-                <SimpleList
-                    primaryText={record => record.title}
-                    secondaryText={record => `${record.views} views`}
-                    tertiaryText={
-						record => 
-							new Date(record.published_at)
-									.toLocaleDateString()
-					}
-                />
-            }
-            medium={
-                <Datagrid>
-                    <TextField source="id" />
-                    <ReferenceField 
-						label="User" 
-						source="userId" 
-						reference="users">
-                        <TextField source="name" />
-                    </ReferenceField>
-                    <TextField source="title" />
-                    <TextField source="body" />
-                    <EditButton />
-                </Datagrid>
-            }
-        />
+		<Datagrid>
+			<TextField source="id" />
+			<ReferenceField 
+				label="Category" 
+				source="categoryId" 
+				reference="categories">
+				<TextField source="title" />
+			</ReferenceField>
+			<DateField source="created" />	
+			<TextField source="title" />
+			<TextField source="text" />
+			<EditButton />
+		</Datagrid>
     </List>
 );
 
@@ -70,11 +56,17 @@ export const PostEdit = (props) => (
     <Edit title={<PostTitle />} {...props}>
         <SimpleForm>
             <DisabledInput source="id" />
-            <ReferenceInput label="User" source="userId" reference="users">
-                <SelectInput optionText="name" />
+			<DateInput 
+				label="Publication date" 
+				source="created"/>
+            <ReferenceInput 
+				label="Category" 
+				source="categoryId" 
+				reference="categories">
+                <SelectInput optionText="title" />
             </ReferenceInput>
             <TextInput source="title" />
-            <LongTextInput source="body" />
+            <LongTextInput source="text" />
         </SimpleForm>
     </Edit>
 );
@@ -82,11 +74,16 @@ export const PostEdit = (props) => (
 export const PostCreate = (props) => (
     <Create {...props}>
         <SimpleForm>
-            <ReferenceInput label="User" source="userId" reference="users" allowEmpty>
-                <SelectInput optionText="name" />
-            </ReferenceInput>
+            
             <TextInput source="title" />
-            <LongTextInput source="body" />
+            <LongTextInput source="text" />
+			<ReferenceInput 
+				label="Category" 
+				source="categoryId" 
+				reference="categories" 
+				allowEmpty>
+                <RadioButtonGroupInput optionText="title" />
+            </ReferenceInput>
         </SimpleForm>
     </Create>
 );

@@ -2,6 +2,8 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use Doctrine\Common\Collections\Criteria;
+
 /**
  * Description of Posts
  *
@@ -9,30 +11,110 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Posts extends REST_Controller 
 {
+	public function index_post()
+	{
+		$title = $this->post("title");
+		$categoryId = $this->post("categoryId");
+		$text = $this->post("text");
+		
+		if (!$title || !$categoryId || !$text)
+		{
+			$this->set_response(null, REST_Controller::HTTP_NOT_ACCEPTABLE);
+		}
+		
+		$orm = DoctrineORM::getORM();
+		$category = 
+			$orm
+				->getRepository('orm\Category')
+				->find($categoryId);
+		
+		if (!$categoryId)
+		{
+			$this->set_response(null, REST_Controller::HTTP_NOT_ACCEPTABLE);
+		}
+		
+		$post = new orm\Post();
+		$post->setCategory($category);
+		$post->setCreated(new DateTime('now'));
+		$post->setText($text);
+		$post->setTitle($title);
+		
+		$orm->persist($post);
+		$orm->flush();
+		
+		$id = $post->getId();
+		
+		$result = [
+			'id' => $id,
+			'title' => $post->getTitle(),
+			'text' => $post->getText(),
+			'created' => $post->getCreated(),
+			'categoryId' => $post->getCategory()->getId()
+		];
+		
+		$respHeader = "Location: /posts/$id";
+			
+		//print_r((array)$result); die();
+
+		$this->output->set_header($respHeader);
+		$this->set_response($result, REST_Controller::HTTP_CREATED);
+	}
+	
 	public function index_get($id = null)
 	{
 		$orm = DoctrineORM::getORM();
 		
 		if ($id)
 		{
+			/* @var $category orm\Post */
+			$post = $orm
+				->getRepository('orm\Post')
+				->find($id);
 			
+			$result = [];
+			
+			if ($post)
+			{
+				$result = [
+					'id' => $post->getId(),
+					'title' => $post->getTitle(),
+					'categoryId' => $post->getCategory()->getId(),
+					'text' => $post->getText(),
+					'created' => $post->getCreated()->format('Y-m-d')
+				];
+			}
+			
+			$this->set_response($result, REST_Controller::HTTP_OK);			
 		} else {
-			$sort = $this->get("sort");
-			$range = $this->get("range");
-			$filter = $this->get("filter");
+			$sort = (array)json_decode($this->get("sort"), true);
+			$range = (array)json_decode($this->get("range"), true);
+			$filter = (array)json_decode($this->get("filter"), true);
 			
-			$repo = $orm->getRepository('orm\Post');
+			//print_r($filter); die();
 			
-			$criteria = Criteria::create()
-				/*->where(Criteria::expr()->eq("birthday", "1982-02-17"))
-				->orderBy(array("username" => Criteria::ASC))
-				->setFirstResult(0)
-				->setMaxResults(20)*/;
-
-			$posts = $repo->matching($criteria);
+			$repo = $orm->getRepository(orm\Post::class);
+			$resp = Telecriteria::getCriteria($sort, $range, $filter, $repo);
 			
-			$this->output->set_header('Content-Range: posts 0-0/0');
-			$this->set_response([$sort, $range, $filter], REST_Controller::HTTP_OK);
+			$posts = $resp[0];
+			$suffix = $resp[1];
+			$respHeader = "Content-Range: posts $suffix";
+			
+			$result = [];
+			
+			/* @var $post orm\Post */
+			foreach ($posts as $post)
+			{
+				$result[] = [
+					'id' => $post->getId(),
+					'categoryId' => $post->getCategory()->getId(),
+					'created' => $post->getCreated()->format('Y-m-d'),
+					'title' => $post->getTitle(),
+					'text' => $post->getText()
+				];
+			}
+			
+			$this->output->set_header($respHeader);
+			$this->set_response($result, REST_Controller::HTTP_OK);
 		}		
 	}
 }
