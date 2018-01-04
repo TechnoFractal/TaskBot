@@ -42,27 +42,38 @@ class KoshkaBot
 		$text = $result["message"]["text"];
 		//Уникальный идентификатор пользователя
 		$chat_id = $result["message"]["chat"]["id"];
-		$user = $result["message"]["from"]["first_name"];
+		$id = $result["message"]["from"]["id"];
+		$firstName = $result["message"]["from"]["first_name"];
 		
-		$api->sendMessage([ 
-			'chat_id' => $chat_id, 
-			'text' => $user 
-		]);
+		$lastName = "";
 		
-		return true;
+		if (isset($result["message"]["from"]["last_name"]))
+		{
+			$lastName = $result["message"]["from"]["last_name"];
+		}
 		
-		//Юзернейм пользователя
-		$name = $result["message"]["from"]["username"];
+		$username = "";
+		
+		if (isset($result["message"]["from"]["username"]))
+		{
+			$username = $result["message"]["from"]["username"];
+		}
+		
+		$isBot = $result["message"]["from"]["is_bot"];
+		
 		//Клавиатура
 		$keyboard = [
-			["Кошке нужна валерьянка"],
-			["Мишка )"]
+			["Легкие задания"],
+			["Средние задания"],
+			["Сложные задания"],
+			["Инфа"],
+			["Связь"]
 		];
 
 		if($text) {
 			 if ($text == "/start") {
-				$reply = "Добро пожаловать в КошкинБот!";
-				$reply_markup = $telegram->replyKeyboardMarkup([ 
+				$reply = "Добро пожаловать в АнтиБот!";
+				$reply_markup = $api->replyKeyboardMarkup([ 
 					'keyboard' => $keyboard, 
 					'resize_keyboard' => true, 
 					'one_time_keyboard' => false 
@@ -75,7 +86,7 @@ class KoshkaBot
 				]);
 			} elseif ($text == "/help") {
 				$reply = "Слава Котам!!!";
-				$telegram->sendMessage([ 
+				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'text' => $reply 
 				]);
@@ -102,15 +113,6 @@ class KoshkaBot
 				'chat_id' => $chat_id, 
 				'text' => "Отправьте текстовое сообщение." 
 			]);
-
-			/*$debug = print_r($result, true);
-
-			$telegram->sendMessage([ 
-				'chat_id' => $chat_id, 
-				'parse_mode' => 'Markdown', 
-				'disable_web_page_preview' => true, 
-				'text' => "```$debug```"
-			]);*/
 		}
 		
 		return true;

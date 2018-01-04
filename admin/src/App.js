@@ -8,10 +8,12 @@ import {
 } from 'admin-on-rest';
 import PostIcon from 'material-ui/svg-icons/action/book';
 import CategoryIcon from 'material-ui/svg-icons/action/assessment';
+import RequesterIcon from 'material-ui/svg-icons/social/group';
 import Dashboard from './Dashboard';
 import authClient from './authClient';
 import { CategoryList, CategoryEdit } from './categories';
 import { PostList, PostEdit, PostCreate } from './posts';
+import { RequesterList } from './requesters';
 
 const httpClient = (url, options = {}) => {
     if (!options.headers) {
@@ -43,6 +45,10 @@ const App = () => (
 			name="categories" 
 			list={CategoryList}
 			edit={CategoryEdit} />
+		<Resource
+			icon={RequesterIcon}
+			name="requesters" 
+			list={RequesterList} />					
 	</Admin>
 );
 

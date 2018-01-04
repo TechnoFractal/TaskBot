@@ -1,6 +1,5 @@
 import React from 'react';
-import { 
-	Filter,
+import {
 	List, 
 	Edit, 
 	Create,
@@ -17,18 +16,6 @@ import {
 	TextInput,
 	DateInput,
 	RadioButtonGroupInput} from 'admin-on-rest';
-
-const PostFilter = (props) => (
-    <Filter {...props}>
-        <TextInput label="Search" source="q" alwaysOn />
-        <ReferenceInput 
-			label="Category" 
-			source="categoryId" 
-			reference="categories">
-            <SelectInput optionText="title" />
-        </ReferenceInput>
-    </Filter>
-);
 
 export const PostList = (props) => (
     <List {...props}>
