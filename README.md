@@ -72,7 +72,7 @@ $config['enable_hooks'] = TRUE;
 
 ## DB
 
-Create database and user:
+### Create database and user:
 
 ```
 mysql -uroot -p
@@ -84,6 +84,17 @@ flush privileges;
 
 You can use user and password as you wish, just keep it same in DB/user  
 creation and bot configuration
+
+### Configure MySQL use UTF-8:
+
+Locate `/etc/mysql/conf.d/mysql.cnf`  
+Put there:  
+
+```
+[mysql]
+character-set-server=utf8
+collation-server=utf8_general_ci
+```
 
 ## Bot config
 
@@ -175,6 +186,8 @@ openssl req
 -subj "/C=RU/ST=Moscow/L=Pushkino/O=KoshkaSoft/CN=domain.org"
 ```
 
+You need to implode the command to one line before run it.  
+
 *IMPORTANT*! You need to set CN exactly as your domain name of the outer  
 callback for Telegramm.
 
@@ -184,9 +197,9 @@ When you will have all the data, than: upload certificate and set callback:
 
 ```
 curl \
-	-F "url=https://domain.org/webhook.php" \
-	-F "certificate=@/var/keys/domain.pem" \
-	https://api.telegram.org/bot<YOURTOKEN>/setWebhook
+-F "url=https://domain.org/webhook.php" \
+-F "certificate=@/var/keys/domain.pem" \
+https://api.telegram.org/bot<YOURTOKEN>/setWebhook
 ```
 
 ## Apache2 hosts
@@ -282,7 +295,13 @@ Substitutions for Apache2 servers in VHosts configurations:
 * Apache2 SSL configuration: `bot.domain.org` -> `telegrammbot.olga.ddns.net`.
 * Apache2 HTTP configuration: `domain.org` -> `telegrammbotapi`
 
-### Port forwarding and dynamic DNS
+### Router configuration
+
+You need configure:
+
+* Port forwarding
+* Dynamic DNS 
+* Link MAC to IP
 
 You need access your router admin panel at the web interface.  It is  
 represented by 192.168.0.1 in list above. For instance it can be:  
@@ -301,6 +320,11 @@ Configure (basing on assumptions above):
 Than you need find option for dynamic DNS and configure it as well.  
 You will need to register on the DDNS service provider.  
 
+Than in options of linking MAC to IP for local DHCP you need link your local  
+MAC address to static IP address.  
+MAC address you cat get from `ifconfig` command in field `HWaddr` of the  
+command output, for port forwarding option will remain actual.
+
 ### /etc/hosts
 
 Append follow lines in /etc/hosts:  
@@ -308,7 +332,12 @@ Append follow lines in /etc/hosts:
 ```
 127.0.0.1	telegrammbotadmin
 127.0.0.1	telegrammbotapi
+127.0.0.1	telegrammbotcb
 ```
+
+* telegrammbotadmin - is for _develop_ ReactJS admin panel
+* telegrammbotapi - is for _develop_ backend of ReactJS panel
+* telegrammbotcb - is for _test connection_ to the bot call back for Telegramm
 
 ### Nginx
 
@@ -358,6 +387,21 @@ Restart the server:  `sudo service nginx restart`
 
 Set apache2 listen on port 8080 instead of 80 in `/etc/apache2/ports.conf`
 You will need restart apache2: `sudo service apache2 restart`
+
+Create one more SSL VHost with `/etc/hosts` name for test connection locally:  
+
+```
+<IfModule mod_ssl.c>
+	<VirtualHost *:443>
+		...
+		ServerName telegrammbotcb
+		...
+	</VirtualHost>
+</IfModule>
+```
+
+Always confirm security exceptions about missing certificate, unless you will  
+have really approved one with known CA.
 
 ## Remote environment configuration
 
