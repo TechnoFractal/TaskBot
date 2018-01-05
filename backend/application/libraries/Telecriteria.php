@@ -32,7 +32,8 @@ class Telecriteria
 		array $sort, 
 		array $range, 
 		array $filter,
-		EntityRepository $repo
+		EntityRepository $repo,
+		adapters\JsonDBAdapter $adapter
 	) : array
 	{		
 		/* @var $criteria Criteria */
@@ -58,7 +59,12 @@ class Telecriteria
 		{
 			$sortBy = $sort[0];
 			$sortOrder = $sort[1];
-			$sorting = [$sortBy => $sortOrder];
+			
+			$sorting = [
+				$adapter->getDbField($sortBy) => $sortOrder
+			];
+			
+			//echo $sortBy; die();
 			$criteria->orderBy($sorting);
 		}
 		

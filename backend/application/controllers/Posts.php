@@ -149,7 +149,13 @@ class Posts extends REST_Controller
 			//print_r($filter); die();
 			
 			$repo = $orm->getRepository(orm\Post::class);
-			$resp = Telecriteria::getCriteria($sort, $range, $filter, $repo);
+			$resp = Telecriteria::getCriteria(
+				$sort, 
+				$range, 
+				$filter, 
+				$repo,
+				new adapters\Post()
+			);
 			
 			$posts = $resp[0];
 			$suffix = $resp[1];

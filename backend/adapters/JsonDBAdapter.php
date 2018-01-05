@@ -18,45 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+namespace adapters;
+
 /**
- * Description of Requesters
  *
  * @author Olga Pshenichnikova <olga@technofractal.org>
  */
-class Requesters extends REST_Controller 
+interface JsonDBAdapter 
 {
-	public function index_get()
-	{
-		$orm = DoctrineORM::getORM();
-		
-		$sort = (array)json_decode($this->get("sort"), true);
-		$range = (array)json_decode($this->get("range"), true);
-		$filter = (array)json_decode($this->get("filter"), true);
-
-		//print_r($filter); die();
-
-		$repo = $orm->getRepository(orm\Requester::class);
-		$resp = Telecriteria::getCriteria(
-			$sort, 
-			$range, 
-			$filter, 
-			$repo,
-			new adapters\Post()
-		);
-
-		$requesters = $resp[0];
-		$suffix = $resp[1];
-		$respHeader = "Content-Range: posts $suffix";
-
-		$result = [];
-
-		/* @var $requester orm\Requester */
-		foreach ($requesters as $requester)
-		{
-			$result[] = $requester->toResult();
-		}
-
-		$this->output->set_header($respHeader);
-		$this->set_response($result, REST_Controller::HTTP_OK);
-	}
+	function getDbField(string $apiField) : string;
 }

@@ -18,45 +18,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+namespace adapters;
+
 /**
- * Description of Requesters
+ * Description of Requester
  *
  * @author Olga Pshenichnikova <olga@technofractal.org>
  */
-class Requesters extends REST_Controller 
+class Requester implements JsonDBAdapter
 {
-	public function index_get()
+	public function getDbField(string $apiField): string 
 	{
-		$orm = DoctrineORM::getORM();
-		
-		$sort = (array)json_decode($this->get("sort"), true);
-		$range = (array)json_decode($this->get("range"), true);
-		$filter = (array)json_decode($this->get("filter"), true);
-
-		//print_r($filter); die();
-
-		$repo = $orm->getRepository(orm\Requester::class);
-		$resp = Telecriteria::getCriteria(
-			$sort, 
-			$range, 
-			$filter, 
-			$repo,
-			new adapters\Post()
-		);
-
-		$requesters = $resp[0];
-		$suffix = $resp[1];
-		$respHeader = "Content-Range: posts $suffix";
-
-		$result = [];
-
-		/* @var $requester orm\Requester */
-		foreach ($requesters as $requester)
-		{
-			$result[] = $requester->toResult();
+		switch ($apiField) {
+			case 'teleId':
+				return 'tele_id';
+			case 'isBot':
+				return 'is_bot';
+			case 'firstName':
+				return 'first_name';
+			case 'lastName';
+				return 'last_name';
+			case 'userName':
+				return 'user_name';
+			case 'accessDate':
+				return 'access_date';
+			case 'categoryId':
+				return 'category';
+			case 'postId':
+				return 'post';
+			default:
+				return $apiField;
 		}
-
-		$this->output->set_header($respHeader);
-		$this->set_response($result, REST_Controller::HTTP_OK);
 	}
 }
