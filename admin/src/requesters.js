@@ -12,7 +12,7 @@ export const RequesterList = (props) => (
     <List {...props}>
 		<Datagrid>
 			<TextField 
-				label="Category" 
+				label="Telegramm ID" 
 				source="teleId" />
 			<BooleanField 
 				label="Is bot?"
