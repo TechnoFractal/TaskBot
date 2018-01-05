@@ -434,6 +434,9 @@ server {
 }
 ```
 
+You need run `npm run build` in the `/admin` directory every time admin NodeJs  
+frontend changed for rebuild it. 
+
 # Test the bot from command line
 
 ```

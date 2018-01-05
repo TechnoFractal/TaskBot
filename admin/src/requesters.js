@@ -11,9 +11,6 @@ import {
 export const RequesterList = (props) => (
     <List {...props}>
 		<Datagrid>
-			<TextField 
-				label="Telegramm ID" 
-				source="teleId" />
 			<BooleanField 
 				label="Is bot?"
 				source="isBot" />
