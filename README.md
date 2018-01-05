@@ -74,15 +74,60 @@ $config['enable_hooks'] = TRUE;
 
 ## DB
 
+## Configure character set:
+
+Lcate `/etc/mysql/mysql.conf.d/mysqld.cnf`
+
+Edit it:
+
+```
+[mysqld]
+...
+character-set-server= utf8mb4
+collation-server=utf8mb4_general_ci
+```
+
+Use `show variables like "character_set_database";` in DB level in mysql  
+console further.  
+
 ### Create database and user:
 
 ```
-mysql -uroot -p
-create database telegrammbot;
+mysql -u root -p
+create database telegrammbot 
+	DEFAULT CHARACTER SET utf8mb4 
+	DEFAULT COLLATE utf8mb4_general_ci;
 create user 'telegrammbot'@'localhost' identified by 'dbpassword';
 grant all privileges on telegrammbot.* to 'telegrammbot'@'localhost';
 flush privileges;
 ```
+
+You cat use also:
+
+```
+SELECT character_set_name FROM information_schema.`COLUMNS` 
+	WHERE table_schema = "telegrammbot"
+	AND table_name = "posts"
+	AND column_name = "text";
+# -
+SELECT default_character_set_name 
+	FROM information_schema.SCHEMATA 
+	WHERE schema_name = "telegrammbot";
+# -
+SELECT CCSA.character_set_name FROM information_schema.`TABLES` T,
+	information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` CCSA
+	WHERE CCSA.collation_name = T.table_collation
+	AND T.table_schema = "telegrammbot"
+	AND T.table_name = "posts";
+#-
+alter database telegrammbot 
+	DEFAULT CHARACTER SET utf8mb4 
+	DEFAULT COLLATE utf8mb4_general_ci;
+# -
+ALTER TABLE posts CONVERT TO CHARACTER SET utf8mb4;
+```
+
+For fix character set.
 
 You can use user and password as you wish, just keep it same in DB/user  
 creation and bot configuration
@@ -493,3 +538,4 @@ Good evening: {name}
 * https://code.tutsplus.com/tutorials/working-with-restful-services-in-codeigniter--net-8814
 * https://core.telegram.org/bots/api
 * https://telegram-bot-sdk.readme.io/docs
+* https://dev.mysql.com/doc/refman/5.7/en/charset-applications.html

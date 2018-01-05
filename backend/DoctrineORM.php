@@ -31,9 +31,9 @@ class DoctrineORM
 			'user'		=> $dbconfig["user"],
 			'password'	=> $dbconfig["password"],
 			'dbname'	=> $dbconfig["db"],
-			'charset'	=> 'UTF8',
+			'charset'	=> 'UTF8mb4',
 			'options'	=> [ 
-				1002 => "SET NAMES 'UTF8'"
+				1002 => "SET NAMES 'UTF8mb4'"
 			]
 		);
 
