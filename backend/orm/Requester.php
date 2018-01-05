@@ -78,13 +78,13 @@ class Requester implements Restable
 	
 	/**
      * @var Post
-	 * @OneToOne(targetEntity="Post")
+	 * @ManyToOne(targetEntity="Post")
      **/
     protected $post;
 	
 	/**
      * @var Category
-	 * @OneToOne(targetEntity="Category")
+	 * @ManyToOne(targetEntity="Category")
      **/
     protected $category;
 	
