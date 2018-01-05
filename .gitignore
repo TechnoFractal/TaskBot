@@ -2,6 +2,7 @@
 
 *.lock
 *lock.json
+.~lock.*
 
 /nbproject/private/
 /admin/node_modules/
