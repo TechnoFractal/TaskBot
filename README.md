@@ -27,7 +27,9 @@ On both we need:
 * MySQL
 * OpenSSL
 
-On development environment we need also `nginx`
+_You need `nginx` on both environment (development and production), thus  
+there is bug in CodeIgniter with `base_url` configuration, and thus it is  
+impossible to set `homapage` for react-js in `npm start` mode._  
 
 ## @BotFather
 
@@ -147,7 +149,7 @@ Install last npm:
 
 ```
 sudo npm install -g n
-n latest
+sudo n latest
 ```
 
 Install all necessary modules from /admin folder: `npm install`
@@ -394,7 +396,43 @@ have really approved one with known CA.
 
 ## Remote environment configuration
 
-TODO: to write
+You still need keep `apache2` on `8080` port for `http` protocol.  
+You need configure nginx in follow way. This is the same way you need  
+configure it for test `npm run build` package on the development.  
+
+Let `antibot.technofractal.org` is our domain.
+
+```
+map $http_upgrade $connection_upgrade {
+	default upgrade;
+	'' close;
+}
+# -
+upstream api {
+	server antibot.technofractal.org:8080;
+}
+# -
+upstream admin {
+	server antibot.technofractal.org:8080;
+}
+# -
+server {
+	listen 80;
+	server_name antibot.technofractal.org;
+# -
+	location /admin {
+		proxy_pass http://admin;
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection $connection_upgrade;
+	}
+# -
+	location /api {
+		rewrite /api/(.*) /$1  break;
+		proxy_pass http://api;
+	}
+}
+```
 
 # Test the bot from command line
 

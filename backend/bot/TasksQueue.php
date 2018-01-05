@@ -128,7 +128,7 @@ class TasksQueue
 			$expr = Criteria::expr();
 			$criteria
 				->where($expr->eq("category", $category))
-				->orderBy(["id" => Criteria::DESC])
+				->orderBy(["id" => Criteria::ASC])
 				->setMaxResults(1);
 			
 			/* @var $post \orm\Post */
@@ -165,7 +165,7 @@ class TasksQueue
 			$criteria
 				->where($expr->eq("category", $category))
 				->andWhere($expr->gt("id", $lastPostId))
-				->orderBy(["id" => Criteria::DESC])
+				->orderBy(["id" => Criteria::ASC])
 				->setMaxResults(1);
 			
 			/* @var $post \orm\Post */
