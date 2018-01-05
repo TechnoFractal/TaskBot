@@ -85,10 +85,7 @@ Edit it:
 ...
 character-set-server= utf8mb4
 collation-server=utf8mb4_general_ci
-```
-
-Use `show variables like "character_set_database";` in DB level in mysql  
-console further.  
+``` 
 
 ### Create database and user:
 
@@ -102,9 +99,11 @@ grant all privileges on telegrammbot.* to 'telegrammbot'@'localhost';
 flush privileges;
 ```
 
-You cat use also:
+You can use also follow commands for fix characters set issues:
 
 ```
+show variables like "character_set_database";
+# -
 SELECT character_set_name FROM information_schema.`COLUMNS` 
 	WHERE table_schema = "telegrammbot"
 	AND table_name = "posts"
