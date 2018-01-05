@@ -40,20 +40,13 @@ class Telecriteria
 		$criteria = Criteria::create();
 		
 		$from = 0;
-		
-		if ($range)
-		{
-			$from = $range[0];
-			$to = $range[1];
-			$criteria
-				->setFirstResult($from)
-				->setMaxResults($to - $from);
-		}
 	
 		if ($filter)
 		{
 			//$criteria->where(Criteria::expr()->eq("birthday", "1982-02-17"));
 		}
+		
+		$count = $repo->matching($criteria)->count();
 		
 		if ($sort)
 		{
@@ -68,8 +61,16 @@ class Telecriteria
 			$criteria->orderBy($sorting);
 		}
 		
+		if ($range)
+		{
+			$from = $range[0];
+			$to = $range[1];
+			$criteria
+				->setFirstResult($from)
+				->setMaxResults($to - $from);
+		}
+		
 		$resp = $repo->matching($criteria)->toArray();
-		$count = count($resp);
 		$to = $from + $count;
 		
 		$suffix = "$from-$to/$count";
