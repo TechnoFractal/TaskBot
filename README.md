@@ -538,3 +538,5 @@ Good evening: {name}
 * https://core.telegram.org/bots/api
 * https://telegram-bot-sdk.readme.io/docs
 * https://dev.mysql.com/doc/refman/5.7/en/charset-applications.html
+* https://scottlinux.com/2011/03/04/rotate-mysql-backups-with-logrotate/
+* https://rclone.org/
