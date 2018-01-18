@@ -4,7 +4,7 @@
 *lock.json
 .~lock.*
 
-/nbproject/private/
+/nbproject/
 /admin/node_modules/
 /admin/build/
 /admin/shared/
