@@ -78,7 +78,7 @@ class Requester implements Restable
 	
 	/**
      * @var Post
-	 * @ManyToOne(targetEntity="Post")
+	 * @ManyToOne(targetEntity="Post", cascade={"remove"})
      **/
     protected $post;
 	
