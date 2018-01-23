@@ -131,6 +131,22 @@ For fix character set.
 You can use user and password as you wish, just keep it same in DB/user  
 creation and bot configuration
 
+### Socket error
+
+If you have follow socket error while use doctrine scripts:
+
+```
+SQLSTATE[HY000] [2002] No such file or directory
+```
+
+1. Run follow command from mysql prompt: `show variables like '%sock%'`
+2. Locate php.ini with: `php -i | grep php.ini`
+3. Past appropriate path to socket file to `php.ini` config file:
+
+```
+pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock
+```
+
 ## Bot config
 
 Create config.yml in /backend/ folder and put:
@@ -155,7 +171,7 @@ goal.
 
 Run at /backend:  
 * For create: `vendor/bin/doctrine orm:schema-tool:create`  
-* For drop: `vendor/bin/doctrine orm:schema-tool:drop'
+* For drop: `vendor/bin/doctrine orm:schema-tool:drop`
 * For update: `vendor/bin/doctrine orm:schema-tool:update`
 
 You need add `--dump-sql` for print the query or `--force` for run the query.  

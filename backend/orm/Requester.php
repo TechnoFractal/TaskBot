@@ -79,6 +79,11 @@ class Requester implements Restable
 	/**
      * @var Post
 	 * @ManyToOne(targetEntity="Post", cascade={"remove"})
+	 * @JoinColumn(
+	 *	name="post_id", 
+	 *	referencedColumnName="id", 
+	 *	onDelete="cascade"
+	 * )
      **/
     protected $post;
 	
