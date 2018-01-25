@@ -156,7 +156,7 @@ class TasksQueue
 				
 				return $post->getText();
 			} else {
-				return self::getData(self::FILE_NOTASKS);
+				return self::getNoTasks($request);
 			}
 		} else {
 			$criteria = Criteria::create();
