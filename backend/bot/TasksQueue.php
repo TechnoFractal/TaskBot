@@ -74,7 +74,7 @@ class TasksQueue
 			case self::HARD_TASKS:
 				return 3;
 			default:
-				throw new Exception("Unhandled category: " . $request);
+				throw new \Exception("Unhandled category: " . $request);
 		}
 	}
 	
@@ -91,7 +91,7 @@ class TasksQueue
 		
 		if (!$category)
 		{
-			throw new Exception("Category not found");
+			throw new \Exception("Category not found");
 		}
 		
 		return $category;

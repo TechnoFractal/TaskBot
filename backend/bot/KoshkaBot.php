@@ -21,8 +21,6 @@
 namespace bot;
 
 use \Telegram\Bot\Api;
-use \Telegram\Bot\Objects\Message;
-use \Telegram\Bot\Objects\Update;
 
 /**
  * Description of KoshkaBot

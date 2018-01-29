@@ -4,7 +4,14 @@
 *lock.json
 .~lock.*
 
+# NB
 /nbproject/
+
+# Eclipse
+/.settings
+/.buildpath
+/.project
+
 /admin/node_modules/
 /admin/build/
 /admin/shared/
