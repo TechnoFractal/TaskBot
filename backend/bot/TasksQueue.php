@@ -22,6 +22,7 @@ namespace bot;
 
 use \Doctrine\Common\Collections\Criteria;
 use \Doctrine\ORM\EntityManager;
+use \Exception;
 
 /**
  * Description of TasksQueue

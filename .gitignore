@@ -4,6 +4,9 @@
 *lock.json
 .~lock.*
 
+/.buildpath
+/.project
+
 /nbproject/
 /admin/node_modules/
 /admin/build/
