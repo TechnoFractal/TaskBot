@@ -41,7 +41,7 @@ class Requesters extends REST_Controller
 			$range, 
 			$filter, 
 			$repo,
-			new adapters\Post()
+			new adapters\Requester()
 		);
 
 		$requesters = $resp[0];

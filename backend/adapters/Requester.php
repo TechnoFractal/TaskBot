@@ -39,7 +39,7 @@ class Requester implements JsonDBAdapter
 			case 'lastName';
 				return 'last_name';
 			case 'userName':
-				return 'user_name';
+				return 'username';
 			case 'accessDate':
 				return 'access_date';
 			case 'categoryId':

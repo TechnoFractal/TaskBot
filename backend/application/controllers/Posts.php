@@ -109,8 +109,9 @@ class Posts extends REST_Controller
 		$orm->persist($post);
 		$orm->flush();
 		
-		$id = $post->getId();
+		Postinformer::informRequesters($orm, $post);
 		
+		$id = $post->getId();
 		$result = $post->toResult();
 		
 		$respHeader = "Location: /posts/$id";

@@ -2,7 +2,6 @@
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Yaml\Yaml;
 
 class DoctrineORM
 {
@@ -20,8 +19,7 @@ class DoctrineORM
 			self::IS_DEV_MODE
 		);
 
-		$configPath = __DIR__ . '/config.yml';
-		$dbconfig = Yaml::parse(file_get_contents($configPath))["db"];
+		$dbconfig = Config::getConfig()["db"];
 
 		//print_r($dbconfig); die();
 		//print_r($config); die();

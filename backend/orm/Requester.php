@@ -28,7 +28,7 @@ namespace orm;
  * @Table(
  *	name="requesters",
  *	uniqueConstraints={
- *		@UniqueConstraint(columns={"category_id", "tele_id"})
+ *		@UniqueConstraint(columns={"tele_id"})
  *	}
  * )
  */
@@ -45,6 +45,12 @@ class Requester implements Restable
 	 * @Column(type="integer")
      */
     protected $tele_id;
+	
+	/**
+     * @var int
+	 * @Column(type="integer")
+     */
+    protected $chat_id;	
 	
 	/**
      * @var bool
@@ -70,28 +76,10 @@ class Requester implements Restable
      */
     protected $username;
 	
-	/**
-	 * @var \DateTime
-     * @Column(type="datetime")
-     **/
-    protected $access_date;
-	
-	/**
-     * @var Post
-	 * @ManyToOne(targetEntity="Post", cascade={"remove"})
-	 * @JoinColumn(
-	 *	name="post_id", 
-	 *	referencedColumnName="id", 
-	 *	onDelete="cascade"
-	 * )
-     **/
-    protected $post;
-	
-	/**
-     * @var Category
-	 * @ManyToOne(targetEntity="Category")
-     **/
-    protected $category;
+	public function isLoaded() : bool
+	{
+		return (bool)$this->id;
+	}
 	
 	public function getId() : int
 	{
@@ -107,6 +95,16 @@ class Requester implements Restable
 	{
 		$this->tele_id = $teleId;
 	}
+	
+	public function getChatId() : int
+	{
+		return $this->chat_id;
+	}
+	
+	public function setChatId(int $chatId)
+	{
+		$this->chat_id = $chatId;
+	}	
 	
 	public function getIsBot() : bool
 	{
@@ -148,36 +146,6 @@ class Requester implements Restable
 		$this->username = $userName;
 	}
 
-	public function getDate() : \DateTime
-	{
-		return $this->access_date;
-	}
-	
-	public function setDate(\DateTime $date)
-	{
-		$this->access_date = $date;
-	}
-	
-	public function getPost() : Post
-	{
-		return $this->post;
-	}
-	
-	public function setPost(Post $post)
-	{
-		$this->post = $post;
-	}
-	
-	public function getCategory() : Category
-	{
-		return $this->category;
-	}
-	
-	public function setCategory(Category $category)
-	{
-		$this->category = $category;
-	}
-
 	public function toResult(): array 
 	{
 		return [
@@ -187,9 +155,9 @@ class Requester implements Restable
 			'firstName' => $this->getFirstName(),
 			'lastName' => $this->getLastName(),
 			'userName' => $this->getUserName(),
-			'accessDate' => $this->getDate()->format("Y-m-d"),
-			'categoryId' => $this->getCategory()->getId(),
-			'postId' => $this->getPost()->getId()
+			//'accessDate' => $this->getDate()->format("Y-m-d"),
+			//'categoryId' => $this->getCategory()->getId(),
+			//'postId' => $this->getPost()->getId()
 		];
 	}
 }

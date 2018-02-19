@@ -22,7 +22,6 @@ namespace bot;
 
 use \Doctrine\Common\Collections\Criteria;
 use \Doctrine\ORM\EntityManager;
-use \Exception;
 
 /**
  * Description of TasksQueue
@@ -41,6 +40,7 @@ class TasksQueue
 	const FILE_INFO = "info";
 	const FILE_CONTACTS = "contacts";
 	const FILE_NOTASKS = "notasks";
+	const FILE_NEWTASKS = "newtask";
 	
 	private static function getData(string $fileName) : string
 	{
@@ -70,7 +70,13 @@ class TasksQueue
 		return str_replace('{type}', $title, $text);
 	}
 	
-	private function getCategoryId(string $request) : int
+	public static function getNewTasks(string $title) : string
+	{
+		$text = self::getData(self::FILE_NEWTASKS);
+		return str_replace('{type}', $title, $text);
+	}
+	
+	public static function getCategoryId(string $request) : int
 	{
 		switch ($request) {
 			case self::LIGHT_TASKS:
@@ -84,12 +90,49 @@ class TasksQueue
 		}
 	}
 	
+	public static function getCategoryName(int $categoryId) : string
+	{
+		switch ($categoryId) {
+			case 1:
+				return self::LIGHT_TASKS;
+			case 2:
+				return self::MIDDLE_TASKS;
+			case 3:
+				return self::HARD_TASKS;
+			default:
+				throw new \Exception("Unhandled category: " . $categoryId);
+		}
+	}
+	
+	private function getRequester(
+		int $teleId,
+		EntityManager $orm
+	) : \orm\Requester
+	{
+		$expr = Criteria::expr();		
+		
+		$criteria = Criteria::create();
+		$criteria->where($expr->eq("tele_id", $teleId));
+		
+		$requester = $orm
+			->getRepository(\orm\Requester::class)
+			->matching($criteria)
+			->first();
+		
+		if (!$requester)
+		{
+			return new \orm\Requester();
+		}
+		
+		return $requester;
+	}
+	
 	private function getCategory(
 		string $request,
 		EntityManager $orm
 	) : \orm\Category
 	{
-		$id = $this->getCategoryId($request);
+		$id = self::getCategoryId($request);
 
 		$category = $orm
 			->getRepository(\orm\Category::class)
@@ -97,7 +140,7 @@ class TasksQueue
 		
 		if (!$category)
 		{
-			throw new \Exception("Category not found");
+			throw new \Exception("Category not found by id: " . $id);
 		}
 		
 		return $category;
@@ -105,7 +148,7 @@ class TasksQueue
 	
 	public function handleRequest(
 		string $request, 
-		\bot\RequesterData $data) : string
+		RequesterData $data) : string
 	{
 		//error_log('here ' . $request); die();
 		
@@ -113,22 +156,35 @@ class TasksQueue
 		
 		$category = $this->getCategory($request, $orm);
 		
-		$expr = Criteria::expr();		
+		/* @var $requester \orm\Requester */
+		$requester = $this->getRequester($data->getId(), $orm);
 		
+		if (!$requester->isLoaded())
+		{
+			$requester->setIsBot($data->getIsBot());
+			$requester->setTeleId($data->getId());
+			$requester->setChatId($data->getChatId());
+			$requester->setFirstName($data->getFirstName());
+			$requester->setLastName($data->getLastName());
+			$requester->setUserName($data->getUserName());
+
+			$orm->persist($requester);
+			$orm->flush();			
+		}
+		
+		$expr = Criteria::expr();
 		$criteria = Criteria::create();
 		$criteria
 			->where($expr->eq("category", $category))
-			->andWhere($expr->eq("tele_id", $data->getId()));
-			//->orderBy(["post_id" => Criteria::DESC])
-			//->setMaxResults(1);
+			->andWhere($expr->eq("requester", $requester));
 		
-		/* @var $requester \orm\Requester */
-		$requester = $orm
-			->getRepository(\orm\Requester::class)
+		/* @var $queuepointer \orm\Queuepointer */
+		$queuepointer = $orm
+			->getRepository(\orm\Queuepointer::class)
 			->matching($criteria)
 			->first();
 		
-		if (!$requester)
+		if (!$queuepointer)
 		{
 			$criteria = Criteria::create();
 			$expr = Criteria::expr();
@@ -145,19 +201,14 @@ class TasksQueue
 			
 			if ($post)
 			{
-				//error_log();
+				//error_log();				
+				$queuepointer = new \orm\Queuepointer();
+				$queuepointer->setRequester($requester);
+				$queuepointer->setCategory($category);
+				$queuepointer->setPost($post);
+				$queuepointer->setDate(new \DateTime('now'));
 				
-				$requester = new \orm\Requester();
-				$requester->setCategory($category);
-				$requester->setDate(new \DateTime('now'));
-				$requester->setFirstName($data->getFirstName());
-				$requester->setIsBot($data->getIsBot());
-				$requester->setLastName($data->getLastName());
-				$requester->setPost($post);
-				$requester->setTeleId($data->getId());
-				$requester->setUserName($data->getUserName());
-				
-				$orm->persist($requester);
+				$orm->persist($queuepointer);
 				$orm->flush();
 				
 				return $post->getText();
@@ -167,7 +218,8 @@ class TasksQueue
 		} else {
 			$criteria = Criteria::create();
 			$expr = Criteria::expr();
-			$lastPostId = $requester->getPost()->getId();
+			$lastPostId = $queuepointer->getPost()->getId();
+			
 			$criteria
 				->where($expr->eq("category", $category))
 				->andWhere($expr->gt("id", $lastPostId))
@@ -182,11 +234,14 @@ class TasksQueue
 			
 			if ($post)
 			{
-				$requester->setPost($post);
+				$queuepointer->setPost($post);
 				$orm->flush();
 				
 				return $post->getText();
 			} else {
+				$queuepointer->setIsLast();
+				$orm->flush();
+				
 				//error_log($request);
 				return self::getNoTasks($request);
 			}

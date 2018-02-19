@@ -23,21 +23,6 @@ export const RequesterList = (props) => (
 			<TextField 
 				label="User Name"
 				source="userName" />
-			<DateField 
-				label="Requsted at"
-				source="accessDate" />	
-			<ReferenceField 
-				label="Category" 
-				source="categoryId" 
-				reference="categories">
-				<TextField source="title" />
-			</ReferenceField>
-			<ReferenceField 
-				label="Post" 
-				source="postId" 
-				reference="posts">
-				<TextField source="title" />
-			</ReferenceField>
 		</Datagrid>
     </List>
 );

@@ -94,13 +94,14 @@ class KoshkaBot
 				
 				//error_log(print_r($result["message"], 1)); die();
 				
-				$requesterData = new RequesterData($message->getFrom());
+				$requesterData = new RequesterData($message);
+				$respText = $tasksQueue->handleRequest($text, $requesterData);
 				//error_log("here1"); die();
 				
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'parse_mode' => 'HTML',
-					'text' => $tasksQueue->handleRequest($text, $requesterData)
+					'text' => $respText
 				]);
 			} else {
 				$reply = "По запросу \"<b>".$text."</b>\" ничего не найдено.";

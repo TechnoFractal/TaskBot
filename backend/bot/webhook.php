@@ -1,13 +1,10 @@
 <?php
 
-define("ROOT", dirname(__DIR__));
-
-include(ROOT . '/vendor/autoload.php'); //Подключаем библиотеку
+include('../vendor/autoload.php');
 
 use Telegram\Bot\Api;
-use Symfony\Component\Yaml\Yaml;
 
-$config = Yaml::parse(file_get_contents(ROOT . '/config.yml'));
+$config = Config::getConfig();
 $api = new Api($config['token']);
 
 $koshkaBot = new bot\KoshkaBot();
