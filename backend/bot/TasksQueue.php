@@ -37,6 +37,7 @@ class TasksQueue
 	const INFO = "Инфа";
 	const CONTACT = "Связь";
 	
+	const FILE_START = "start";
 	const FILE_INFO = "info";
 	const FILE_CONTACTS = "contacts";
 	const FILE_NOTASKS = "notasks";
@@ -47,11 +48,15 @@ class TasksQueue
 		$text = str_replace("\n", "", $text);
 		return str_replace("\\n", "\r\n", $text);
 	}
+
+	public static function getStart() : string
+	{
+		return self::getData(self::FILE_START);
+	}
 	
 	public static function getInfo() : string
 	{
 		return self::getData(self::FILE_INFO);
-		
 	}
 	
 	public static function getContacts() : string
@@ -75,7 +80,7 @@ class TasksQueue
 			case self::HARD_TASKS:
 				return 3;
 			default:
-				throw new Exception("Unhandled category: " . $request);
+				throw new \Exception("Unhandled category: " . $request);
 		}
 	}
 	
@@ -92,7 +97,7 @@ class TasksQueue
 		
 		if (!$category)
 		{
-			throw new Exception("Category not found");
+			throw new \Exception("Category not found");
 		}
 		
 		return $category;

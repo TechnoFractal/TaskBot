@@ -21,8 +21,6 @@
 namespace bot;
 
 use \Telegram\Bot\Api;
-use \Telegram\Bot\Objects\Message;
-use \Telegram\Bot\Objects\Update;
 
 /**
  * Description of KoshkaBot
@@ -61,21 +59,19 @@ class KoshkaBot
 			[TasksQueue::INFO],
 			[TasksQueue::CONTACT]
 		];
-
-		//error_log('here');
 		
 		if($text) {
 			 if ($text == "/start") {
-				$reply = "Добро пожаловать в АнтиБот!";
 				$reply_markup = $api->replyKeyboardMarkup([ 
 					'keyboard' => $keyboard, 
 					'resize_keyboard' => true, 
 					'one_time_keyboard' => false 
 				]);
-
+				
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
-					'text' => $reply, 
+					'parse_mode' => 'HTML',
+					'text' => TasksQueue::getStart(),
 					'reply_markup' => $reply_markup 
 				]);
 			} elseif ($text == "/help" || $text == TasksQueue::INFO) {
