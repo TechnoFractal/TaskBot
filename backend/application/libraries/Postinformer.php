@@ -47,12 +47,16 @@ class Postinformer
 			$categoryId = $post->getCategory()->getId();
 			$categoryName = \bot\TasksQueue::getCategoryName($categoryId);
 			$text = bot\TasksQueue::getNewTasks($categoryName);
+			$chatId = $requester->getChatId();
 			
-			$api->sendMessage([ 
-				'chat_id' => $requester->getChatId(),
-				'parse_mode' => 'HTML',
-				'text' => $text
-			]);
+			if ($chatId)
+			{			
+				$api->sendMessage([ 
+					'chat_id' => $chatId,
+					'parse_mode' => 'HTML',
+					'text' => $text
+				]);
+			}
 		}
 	}
 }
