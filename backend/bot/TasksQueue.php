@@ -234,6 +234,7 @@ class TasksQueue
 			
 			if ($post)
 			{
+				$queuepointer->setIsNotLast();
 				$queuepointer->setPost($post);
 				$orm->flush();
 				

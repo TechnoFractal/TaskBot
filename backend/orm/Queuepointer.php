@@ -71,7 +71,7 @@ class Queuepointer
 	
 	public function __construct() 
 	{
-		$this->isLast = FALSE;
+		$this->isLast = false;
 	}
 	
 	public function getId() : int
@@ -87,6 +87,11 @@ class Queuepointer
 	public function setIsLast()
 	{
 		$this->isLast = true;
+	}
+	
+	public function setIsNotLast()
+	{
+		$this->isLast = false;
 	}
 	
 	public function getDate() : \DateTime

@@ -7,7 +7,6 @@
  */
 
 use \Doctrine\ORM\EntityManager;
-use \Doctrine\Common\Collections\Criteria;
 use \Telegram\Bot\Api;
 
 /**
@@ -24,28 +23,33 @@ class Postinformer
 		$token = Config::getConfig()["token"];
 		$api = new Api($token);		
 		
-		$expr = Criteria::expr();		
+		//$expr = Criteria::expr();		
 		
-		$criteria = Criteria::create();
-		$criteria
-			->where($expr->eq("isLast", true))
-			->andWhere($expr->eq("category", $post->getCategory()));
+		//$criteria = Criteria::create();
+		//$criteria
+		//	->where($expr->eq("isLast", true))
+		//	->andWhere($expr->eq("category", $post->getCategory()));
 		
 		/* @var $queuepointers array */
-		$queuepointers = $orm
-			->getRepository(\orm\Queuepointer::class)
-			->matching($criteria)
-			->toArray();
+		//$queuepointers = $orm
+		//	->getRepository(\orm\Queuepointer::class)
+		//	->matching($criteria)
+		//	->toArray();
+		
+		/* @var $queuepointers array */
+		$requesters = $orm
+			->getRepository(\orm\Requester::class)
+			->findAll();
 			
-		/* @var $queuepointer orm\Queuepointer */
-		foreach ($queuepointers as $queuepointer)
+		/* @var $requester orm\Requester */
+		foreach ($requesters as $requester)
 		{
 			$categoryId = $post->getCategory()->getId();
 			$categoryName = \bot\TasksQueue::getCategoryName($categoryId);
 			$text = bot\TasksQueue::getNewTasks($categoryName);
 			
 			$api->sendMessage([ 
-				'chat_id' => $queuepointer->getRequester()->getChatId(),
+				'chat_id' => $requester->getChatId(),
 				'parse_mode' => 'HTML',
 				'text' => $text
 			]);
