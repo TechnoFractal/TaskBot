@@ -159,18 +159,19 @@ class TasksQueue
 		/* @var $requester \orm\Requester */
 		$requester = $this->getRequester($data->getId(), $orm);
 		
+		$requester->setIsBot($data->getIsBot());
+		$requester->setTeleId($data->getId());
+		$requester->setChatId($data->getChatId());
+		$requester->setFirstName($data->getFirstName());
+		$requester->setLastName($data->getLastName());
+		$requester->setUserName($data->getUserName());
+			
 		if (!$requester->isLoaded())
 		{
-			$requester->setIsBot($data->getIsBot());
-			$requester->setTeleId($data->getId());
-			$requester->setChatId($data->getChatId());
-			$requester->setFirstName($data->getFirstName());
-			$requester->setLastName($data->getLastName());
-			$requester->setUserName($data->getUserName());
-
 			$orm->persist($requester);
-			$orm->flush();			
 		}
+		
+		$orm->flush();
 		
 		$expr = Criteria::expr();
 		$criteria = Criteria::create();
