@@ -90,14 +90,14 @@ class KoshkaBot
 			[DataHelper::CONTACT]
 		];
 		
-		if ($newUser->getId() == $botId)
+		if ($newUser && $newUser->getId() == $botId)
 		{			
 			$api->sendMessage([ 
 				'chat_id' => $chat_id, 
 				'parse_mode' => 'HTML',
 				'text' => DataHelper::getHello()
 			]);
-		} else if ($newUser->getId() && $newUser->getId() !== $botId) {
+		} else if ($newUser && $newUser->getId() !== $botId) {
 			$name = $this->getUserName($newUser);			
 			
 			$api->sendMessage([ 
