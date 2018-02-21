@@ -58,7 +58,7 @@ class TasksQueue
 		EntityManager $orm
 	) : \orm\Category
 	{
-		$id = self::getCategoryId($request);
+		$id = DataHelper::getCategoryId($request);
 
 		$category = $orm
 			->getRepository(\orm\Category::class)
@@ -140,7 +140,7 @@ class TasksQueue
 				
 				return $post->getText();
 			} else {
-				return self::getNoTasks($request);
+				return DataHelper::getNoTasks($request);
 			}
 		} else {
 			$criteria = Criteria::create();
@@ -171,7 +171,7 @@ class TasksQueue
 				$orm->flush();
 				
 				//error_log($request);
-				return self::getNoTasks($request);
+				return DataHelper::getNoTasks($request);
 			}
 		}
 	}
