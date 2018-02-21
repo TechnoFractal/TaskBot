@@ -32,6 +32,7 @@ class DataHelper
 	const FILE_NOTFOUND = "notfound";
 	const FILE_HELLO = "hello";
 	const FILE_HI = "hi";
+	const FILE_BYE = "bye";
 	const FILE_START = "start";
 	const FILE_INFO = "info";
 	const FILE_CONTACTS = "contacts";
@@ -87,6 +88,12 @@ class DataHelper
 	public static function getHi(string $username) : string
 	{
 		$text = self::getData(self::FILE_HI);
+		return str_replace('{username}', $username, $text);
+	}
+	
+	public static function getBye(string $username) : string
+	{
+		$text = self::getData(self::FILE_BYE);
 		return str_replace('{username}', $username, $text);
 	}
 	

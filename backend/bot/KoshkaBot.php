@@ -78,6 +78,9 @@ class KoshkaBot
 		/* @var $newUser User */
 		$newUser = $message->getNewChatParticipant();
 		
+		/* @var $leftUser User */
+		$leftUser = $message->getLeftChatParticipant();
+		
 		/* @var $text string */
 		$text = $message->getText();
 		
@@ -98,12 +101,20 @@ class KoshkaBot
 				'text' => DataHelper::getHello()
 			]);
 		} else if ($newUser && $newUser->getId() !== $botId) {
-			$name = $this->getUserName($newUser);			
+			$name = $this->getUserName($newUser);
 			
 			$api->sendMessage([ 
 				'chat_id' => $chat_id, 
 				'parse_mode' => 'HTML',
 				'text' => DataHelper::getHi($name)
+			]);
+		} else if ($leftUser) {
+			$name = $this->getUserName($leftUser);
+			
+			$api->sendMessage([ 
+				'chat_id' => $chat_id, 
+				'parse_mode' => 'HTML',
+				'text' => DataHelper::getBye($name)
 			]);
 		} else if ($text) {
 			 if ($text == "/start") {
