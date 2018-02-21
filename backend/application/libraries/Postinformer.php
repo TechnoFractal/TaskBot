@@ -8,6 +8,7 @@
 
 use \Doctrine\ORM\EntityManager;
 use \Telegram\Bot\Api;
+use \Telegram\Bot\Exceptions\TelegramResponseException;
 
 /**
  * Description of Postinformer
@@ -51,11 +52,15 @@ class Postinformer
 			
 			if ($chatId)
 			{			
-				$api->sendMessage([ 
-					'chat_id' => $chatId,
-					'parse_mode' => 'HTML',
-					'text' => $text
-				]);
+				try {
+					$api->sendMessage([ 
+						'chat_id' => $chatId,
+						'parse_mode' => 'HTML',
+						'text' => $text
+					]);
+				} catch (TelegramResponseException $e) {
+					error_log($e->getMessage());
+				}
 			}
 		}
 	}
