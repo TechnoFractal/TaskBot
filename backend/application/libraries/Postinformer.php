@@ -45,8 +45,8 @@ class Postinformer
 		foreach ($requesters as $requester)
 		{
 			$categoryId = $post->getCategory()->getId();
-			$categoryName = \bot\TasksQueue::getCategoryName($categoryId);
-			$text = bot\TasksQueue::getNewTasks($categoryName);
+			$categoryName = \bot\DataHelper::getCategoryName($categoryId);
+			$text = bot\DataHelper::getNewTasks($categoryName);
 			$chatId = $requester->getChatId();
 			
 			if ($chatId)

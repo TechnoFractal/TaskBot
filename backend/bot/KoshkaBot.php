@@ -21,6 +21,9 @@
 namespace bot;
 
 use \Telegram\Bot\Api;
+use \Telegram\Bot\Objects\User;
+use \Telegram\Bot\Objects\Update;
+use \Telegram\Bot\Objects\Message;
 
 /**
  * Description of KoshkaBot
@@ -29,6 +32,29 @@ use \Telegram\Bot\Api;
  */
 class KoshkaBot 
 {
+	private function getUserName(User $user)
+	{
+		$firstname = $user->getFirstName();
+		$lastname = $user->getLastNameName();
+		$username = $user->getUsernameName();
+
+		$name = "Неизвестный";
+			
+		if ($firstname || $lastname) {
+			if ($firstname) {
+				$name = $firstname;
+			}
+
+			if ($lastname) {
+				$name .= " " . $lastname;
+			}
+		} else if ($username) {
+			$name = $username;
+		}
+		
+		return $name;
+	}
+	
 	public function handleRequest(Api $api) : bool
 	{
 		/* @var $result Update */
@@ -43,24 +69,43 @@ class KoshkaBot
 			return false;
 		}
 		
-		//Текст сообщения
-		$text = $message->getText();
-		//Уникальный идентификатор пользователя
+		/* @var $botId int */
+		$botId = (int)\Config::getConfig()['botId'];
+		
+		/* @var $chat_id int */
 		$chat_id = $message->getChat()->getId();
 		
+		/* @var $newUser User */
+		$newUser = $message->getNewChatParticipant();
 		
-		//error_log($text); die();
+		/* @var $text string */
+		$text = $message->getText();
 		
 		//Клавиатура
 		$keyboard = [
-			[TasksQueue::LIGHT_TASKS],
-			[TasksQueue::MIDDLE_TASKS],
-			[TasksQueue::HARD_TASKS],
-			[TasksQueue::INFO],
-			[TasksQueue::CONTACT]
+			[DataHelper::LIGHT_TASKS],
+			[DataHelper::MIDDLE_TASKS],
+			[DataHelper::HARD_TASKS],
+			[DataHelper::INFO],
+			[DataHelper::CONTACT]
 		];
 		
-		if($text) {
+		if ($newUser->getId() == $botId)
+		{			
+			$api->sendMessage([ 
+				'chat_id' => $chat_id, 
+				'parse_mode' => 'HTML',
+				'text' => DataHelper::getHello()
+			]);
+		} else if ($newUser->getId() && $newUser->getId() !== $botId) {
+			$name = $this->getUserName($newUser);			
+			
+			$api->sendMessage([ 
+				'chat_id' => $chat_id, 
+				'parse_mode' => 'HTML',
+				'text' => DataHelper::getHi($name)
+			]);
+		} else if ($text) {
 			 if ($text == "/start") {
 				$reply_markup = $api->replyKeyboardMarkup([ 
 					'keyboard' => $keyboard, 
@@ -71,50 +116,46 @@ class KoshkaBot
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'parse_mode' => 'HTML',
-					'text' => TasksQueue::getStart(),
+					'text' => DataHelper::getStart(),
 					'reply_markup' => $reply_markup 
 				]);
-			} elseif ($text == "/help" || $text == TasksQueue::INFO) {
+			} elseif ($text == "/help" || $text == DataHelper::INFO) {
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'parse_mode' => 'HTML',
-					'text' => TasksQueue::getInfo()
+					'text' => DataHelper::getInfo()
 				]);
-			} elseif ($text == TasksQueue::CONTACT) {
+			} elseif ($text == DataHelper::CONTACT) {
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'parse_mode' => 'HTML',
-					'text' => TasksQueue::getContacts()
+					'text' => DataHelper::getContacts()
 				]);
 			} else if (
-				$text == TasksQueue::LIGHT_TASKS ||
-				$text == TasksQueue::MIDDLE_TASKS ||
-				$text == TasksQueue::HARD_TASKS) {
+				$text == DataHelper::LIGHT_TASKS ||
+				$text == DataHelper::MIDDLE_TASKS ||
+				$text == DataHelper::HARD_TASKS) {
 				$tasksQueue = new TasksQueue();
-				
-				//error_log(print_r($result["message"], 1)); die();
 				
 				$requesterData = new RequesterData($message);
 				$respText = $tasksQueue->handleRequest($text, $requesterData);
-				//error_log("here1"); die();
 				
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'parse_mode' => 'HTML',
 					'text' => $respText
 				]);
-			} else {
-				$reply = "По запросу \"<b>".$text."</b>\" ничего не найдено.";
+			} else {				
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'parse_mode'=> 'HTML', 
-					'text' => $reply 
+					'text' => DataHelper::getNotFound($text) 
 				]);
 			}
-		}else{
+		} else {
 			$api->sendMessage([ 
 				'chat_id' => $chat_id, 
-				'text' => "Отправьте текстовое сообщение." 
+				'text' => DataHelper::getDefault()
 			]);
 		}
 		

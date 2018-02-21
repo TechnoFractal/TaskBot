@@ -153,11 +153,21 @@ Create config.yml in /backend/ folder and put:
 
 ```
 token: "BOT_TOKEN"
+botId: "BOT ID"
 db:
   user: "telegrammbot"
   password: "dbpassword"
   db: "telegrammbot"
   driver: "pdo_mysql"
+```
+
+* token - the bot token
+* botId - the ID of the same bot
+
+Perform follow GET query for retrieve bot ID:
+
+```
+https://api.telegram.org/bot<YOURTOKEN>/getMe
 ```
 
 The driver part is mostly problematic one. You need make your php installation  
