@@ -85,7 +85,7 @@ class Session implements Restable
 
     public function getIP() : string
     {
-        return $this->ip;
+		return $this->ip ? $this->ip : "";
     }
 
     public function setToken(string $token)
