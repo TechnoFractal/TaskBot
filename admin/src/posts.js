@@ -7,7 +7,8 @@ import {
 	ReferenceField, 
 	TextField,
 	DateField,
-	EditButton, 
+	EditButton,
+	DeleteButton,
 	DisabledInput, 
 	LongTextInput, 
 	ReferenceInput, 
@@ -30,6 +31,7 @@ export const PostList = (props) => (
 			<DateField source="created" />	
 			<TextField source="title" />
 			<EditButton />
+			<DeleteButton />
 		</Datagrid>
     </List>
 );
@@ -63,7 +65,6 @@ export const PostEdit = (props) => (
 export const PostCreate = (props) => (
     <Create {...props}>
         <SimpleForm>
-            
             <TextInput source="title" />
             <LongTextInput source="text" />
 			<ReferenceInput 

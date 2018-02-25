@@ -18,8 +18,9 @@ class DoctrineORM
 			[__DIR__ . "/orm"], 
 			self::IS_DEV_MODE
 		);
-
-		$dbconfig = Config::getConfig()["db"];
+		
+		$botconfig = new Config();
+		$dbconfig = $botconfig->getDB();
 
 		//print_r($dbconfig); die();
 		//print_r($config); die();

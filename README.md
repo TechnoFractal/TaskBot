@@ -47,11 +47,11 @@ It is ignored by git.
 
 ## Git
 
-Clone the project some where it can be accessable for Apache2 and Nginx
+Clone the project some where it can be accessed for Apache2 and Nginx
 
 ## Composer
 
-Navigate to /path/to/project/backend forlder and run `composer install`
+Navigate to /path/to/project/backend folder and run `composer install`
 
 ## CodeIgniter
 
@@ -153,7 +153,6 @@ Create config.yml in /backend/ folder and put:
 
 ```
 token: "BOT_TOKEN"
-botId: "BOT ID"
 db:
   user: "telegrammbot"
   password: "dbpassword"
@@ -162,9 +161,8 @@ db:
 ```
 
 * token - the bot token
-* botId - the ID of the same bot
 
-Perform follow GET query for retrieve bot ID:
+Perform follow GET query for retrieve some bot data if necessary:
 
 ```
 https://api.telegram.org/bot<YOURTOKEN>/getMe
@@ -199,7 +197,7 @@ source script.sql
 Create account for admin:  
 
 ```
-desc users;
+show create table users;
 insert into users(`login`, `password`) values ("username", "password");
 select * from users;
 ```
@@ -251,6 +249,12 @@ You need to implode the command to one line before run it.
 
 *IMPORTANT*! You need to set CN exactly as your domain name of the outer  
 callback for Telegramm.
+
+For print certificate data:
+
+```
+openssl x509 -in domain.pem -text
+```
 
 Perform follow (curl) step after you will achive all the goals described  
 below, and have all necessary data.  

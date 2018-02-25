@@ -5,7 +5,8 @@ import {
 	ReferenceField, 
 	TextField,
 	DateField,
-	BooleanField
+	BooleanField,
+	DeleteButton
 } from 'admin-on-rest';
 
 export const RequesterList = (props) => (
@@ -23,6 +24,7 @@ export const RequesterList = (props) => (
 			<TextField 
 				label="User Name"
 				source="userName" />
+			<DeleteButton />
 		</Datagrid>
     </List>
 );

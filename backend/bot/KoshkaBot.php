@@ -69,8 +69,10 @@ class KoshkaBot
 			return false;
 		}
 		
+		$config = new \Config();
+		
 		/* @var $botId int */
-		$botId = (int)\Config::getConfig()['botId'];
+		$botId = $config->getBotId();
 		
 		/* @var $chat_id int */
 		$chat_id = $message->getChat()->getId();

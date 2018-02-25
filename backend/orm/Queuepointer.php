@@ -30,7 +30,7 @@ class Queuepointer
 	
 	/**
      * @var Requester
-	 * @ManyToOne(targetEntity="Requester", cascade={"remove"})
+	 * @ManyToOne(targetEntity="Requester")
 	 * @JoinColumn(
 	 *	name="requester_id", 
 	 *	referencedColumnName="id", 

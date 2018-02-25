@@ -67,10 +67,12 @@ class Auth extends REST_Controller
 		if ($user && $user->getPassword() == $password) 
 		{
 			$token = bin2hex(random_bytes(self::LENGTH));
+			$ip = $this->input->ip_address();
 			$session = new Session();
 			$session->setCreated(new DateTime('now'));
 			$session->setToken($token);
 			$session->setUser($user);
+			$session->setIP($ip);
 
 			$orm->persist($session);
 			$orm->flush();
