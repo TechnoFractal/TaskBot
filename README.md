@@ -194,13 +194,25 @@ use dbname
 source script.sql
 ```
 
-Create account for admin:  
+Create account for admin: 
+
+**Important! You need to md5 the passwords** 
 
 ```
 show create table users;
-insert into users(`login`, `password`) values ("username", "password");
+insert into users(`login`, `password`) values (
+> "username", 
+> "5f4dcc3b5aa765d61d8327deb882cf99");
 select * from users;
 ```
+
+You can `md5` the data from the shell using `md5sum` command:
+
+```
+echo -n "password" | md5sum
+```
+
+*Remember to use `-n` option for skip new line!*
 
 _You need choose username and password_ It is credential data for login from  
 Admin-On-Rest admin panel.

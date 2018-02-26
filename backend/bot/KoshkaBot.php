@@ -35,9 +35,9 @@ class KoshkaBot
 	private function getUserName(User $user)
 	{
 		$firstname = $user->getFirstName();
-		$lastname = $user->getLastNameName();
+		$lastname = $user->getLastName();
 		$username = $user->getUsernameName();
-
+		
 		$name = "Неизвестный";
 			
 		if ($firstname || $lastname) {

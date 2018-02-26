@@ -64,7 +64,7 @@ class Auth extends REST_Controller
 				->getRepository(orm\User::class)
 				->findOneBy(['login' => $login]);
 		
-		if ($user && $user->getPassword() == $password) 
+		if ($user && $user->getPassword() == md5($password))
 		{
 			$token = bin2hex(random_bytes(self::LENGTH));
 			$ip = $this->input->ip_address();
