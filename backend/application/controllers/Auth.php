@@ -50,6 +50,20 @@ class Auth extends REST_Controller
     {
 		$login = $this->post('username');
 		$password = $this->post('password');
+		$ip = $this->input->server('HTTP_X_REAL_IP');
+		
+		if (!$ip) {
+			$message = [
+				"error" => "X-Real-IP header is mising"
+			];
+			
+			$this->set_response(
+				$message, 
+				REST_Controller::HTTP_FAILED_DEPENDENCY
+			);
+			
+			return;
+		}
 		
 		if (!$login || !$password)
 		{
@@ -66,8 +80,7 @@ class Auth extends REST_Controller
 		
 		if ($user && $user->getPassword() == md5($password))
 		{
-			$token = bin2hex(random_bytes(self::LENGTH));
-			$ip = $this->input->ip_address();
+			$token = bin2hex(random_bytes(self::LENGTH));			
 			$session = new Session();
 			$session->setCreated(new DateTime('now'));
 			$session->setToken($token);
