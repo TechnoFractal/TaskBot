@@ -430,17 +430,21 @@ server {
 	location / {
 		proxy_pass http://websocket;
 		proxy_http_version 1.1;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection $connection_upgrade;
+		proxy_set_header	Upgrade		$http_upgrade;
+		proxy_set_header	Connection	$connection_upgrade;
+		proxy_set_header	X-Real-IP	$remote_addr;
 	}
 # -
 	location /api {
 		rewrite /api/(.*) /$1  break;
 		proxy_pass http://api;
-		proxy_set_header Host telegrammbotapi;
+		proxy_set_header	Host		telegrammbotapi;
+		proxy_set_header	X-Real-IP	$remote_addr;
 	}
 }
 ```
+
+**It is very important to set `X-Real-IP` header**
 
 Restart the server:  `sudo service nginx restart`
 
