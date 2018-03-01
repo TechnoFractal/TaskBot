@@ -86,7 +86,7 @@ class Categories extends REST_Controller
 			//print_r($filter); die();
 			
 			$repo = $orm->getRepository(orm\Category::class);
-			$resp = Telecriteria::getCriteria(
+			$resp = Telecriteria::getData(
 				$sort, 
 				$range, 
 				$filter, 

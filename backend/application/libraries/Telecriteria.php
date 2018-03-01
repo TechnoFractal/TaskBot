@@ -28,7 +28,7 @@ use Doctrine\ORM\EntityRepository;
  */
 class Telecriteria
 {
-	public static function getCriteria(
+	public static function getData(
 		array $sort, 
 		array $range, 
 		array $filter,

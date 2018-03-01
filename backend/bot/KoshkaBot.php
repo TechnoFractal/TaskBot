@@ -35,9 +35,9 @@ class KoshkaBot
 	private function getUserName(User $user)
 	{
 		$firstname = $user->getFirstName();
-		$lastname = $user->getLastNameName();
+		$lastname = $user->getLastName();
 		$username = $user->getUsernameName();
-
+		
 		$name = "Неизвестный";
 			
 		if ($firstname || $lastname) {
@@ -69,8 +69,10 @@ class KoshkaBot
 			return false;
 		}
 		
+		$config = new \Config();
+		
 		/* @var $botId int */
-		$botId = (int)\Config::getConfig()['botId'];
+		$botId = $config->getBotId();
 		
 		/* @var $chat_id int */
 		$chat_id = $message->getChat()->getId();

@@ -24,9 +24,21 @@ class Session implements Restable
 	
 	/**
      * @var User
-	 * @ManyToOne(targetEntity="User", inversedBy="sessions")
+	 * @ManyToOne(targetEntity="User")
+	 * @JoinColumn(
+	 *	name="user_id", 
+	 *	referencedColumnName="id", 
+	 *	onDelete="cascade"
+	 * )
      **/
     protected $user;
+	
+	/**
+	 *
+	 * @var string
+	 * @Column(type="string", nullable=true)
+	 */
+	protected $ip;
 	
 	/**
 	 * @var \DateTime
@@ -65,6 +77,16 @@ class Session implements Restable
     {
         return $this->created;
     }
+	
+	public function setIP(string $ip)
+    {
+        $this->ip = $ip;
+    }
+
+    public function getIP() : string
+    {
+		return $this->ip ? $this->ip : "";
+    }
 
     public function setToken(string $token)
     {
@@ -80,6 +102,7 @@ class Session implements Restable
 		return [
 			'id' => $this->getId(),
 			'token' => $this->getToken(),
+			'ip' => $this->getIP(),
 			'userId' => $this->getUser()->getId(),
 			'created' => $this->getCreated()->format('Y-m-d')
 		];

@@ -17,9 +17,59 @@ use Symfony\Component\Yaml\Yaml;
  */
 class Config 
 {
-	public static function getConfig() : array
+	/**
+	 *
+	 * @var array
+	 */
+	private $config;
+	
+	/**
+	 *
+	 * @var string
+	 */
+	private $token;
+	
+	/**
+	 *
+	 * @var int
+	 */
+	private $id;
+	
+	/**
+	 *
+	 * @var array
+	 */
+	private $db;
+	
+	public function __construct() 
 	{
 		$configPath = __DIR__ . '/config.yml';
-		return Yaml::parse(file_get_contents($configPath));
+		$config = Yaml::parse(file_get_contents($configPath));
+		$token = $config["token"];
+		$id = explode(':', $token)[0];
+		$this->config = $config;
+		$this->token = $token;
+		$this->id = (int)$id;
+		$this->db = $config["db"];
+	}
+	
+	public function getConfig() : array
+	{
+		return $this->config;
+	}
+	
+	public function getToken() : string
+	{
+		return $this->token;
+	}
+	
+	public function getBotId() : int
+	{
+		return $this->id;
+	}
+	
+	public function getDB() : array
+	{
+		return $this->db;
 	}
 }

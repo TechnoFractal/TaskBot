@@ -128,7 +128,7 @@ class Posts extends REST_Controller
 		
 		if ($id)
 		{
-			/* @var $category orm\Post */
+			/* @var $post orm\Post */
 			$post = $orm
 				->getRepository(orm\Post::class)
 				->find($id);
@@ -150,7 +150,7 @@ class Posts extends REST_Controller
 			//print_r($filter); die();
 			
 			$repo = $orm->getRepository(orm\Post::class);
-			$resp = Telecriteria::getCriteria(
+			$resp = Telecriteria::getData(
 				$sort, 
 				$range, 
 				$filter, 

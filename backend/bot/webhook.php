@@ -4,8 +4,8 @@ include('../vendor/autoload.php');
 
 use Telegram\Bot\Api;
 
-$config = Config::getConfig();
-$api = new Api($config['token']);
+$config = new Config();
+$api = new Api($config->getToken());
 
 $koshkaBot = new bot\KoshkaBot();
 

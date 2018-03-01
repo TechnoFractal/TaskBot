@@ -21,7 +21,8 @@ class Postinformer
 		EntityManager $orm,
 		\orm\Post $post
 	) {
-		$token = Config::getConfig()["token"];
+		$config = new Config();
+		$token = $config->getToken();
 		$api = new Api($token);		
 		
 		//$expr = Criteria::expr();		

@@ -6,7 +6,7 @@ export default () => (
         <CardHeader title="Welcome to the administration" />
         <CardText>
 			<div>AntiBot - Telegramm</div>
-			<div class="poweredby"><i>Powered by Koshka!!!</i></div>
+			<div className="poweredby"><i>Powered by Koshka!!!</i></div>
 		</CardText>
     </Card>
 );
