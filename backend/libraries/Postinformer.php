@@ -6,6 +6,8 @@
  * and open the template in the editor.
  */
 
+namespace libraries;
+
 use \Doctrine\ORM\EntityManager;
 use \Telegram\Bot\Api;
 use \Telegram\Bot\Exceptions\TelegramResponseException;
@@ -21,7 +23,7 @@ class Postinformer
 		EntityManager $orm,
 		\orm\Post $post
 	) {
-		$config = new Config();
+		$config = new \Config();
 		$token = $config->getToken();
 		$api = new Api($token);		
 		
@@ -48,7 +50,7 @@ class Postinformer
 		{
 			$categoryId = $post->getCategory()->getId();
 			$categoryName = \bot\DataHelper::getCategoryName($categoryId);
-			$text = bot\DataHelper::getNewTasks($categoryName);
+			$text = \bot\DataHelper::getNewTasks($categoryName);
 			$chatId = $requester->getChatId();
 			
 			if ($chatId)

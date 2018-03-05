@@ -116,7 +116,8 @@ class TasksQueue
 			$criteria = Criteria::create();
 			$expr = Criteria::expr();
 			$criteria
-				->where($expr->eq("category", $category))
+				->where(Criteria::expr()->eq("category", $category))
+				->andWhere(Criteria::expr()->eq("deleted", false))
 				->orderBy(["id" => Criteria::ASC])
 				->setMaxResults(1);
 			
@@ -144,12 +145,12 @@ class TasksQueue
 			}
 		} else {
 			$criteria = Criteria::create();
-			$expr = Criteria::expr();
 			$lastPostId = $queuepointer->getPost()->getId();
 			
 			$criteria
-				->where($expr->eq("category", $category))
-				->andWhere($expr->gt("id", $lastPostId))
+				->where(Criteria::expr()->eq("category", $category))
+				->andWhere(Criteria::expr()->gt("id", $lastPostId))
+				->andWhere(Criteria::expr()->eq("deleted", false))
 				->orderBy(["id" => Criteria::ASC])
 				->setMaxResults(1);
 			

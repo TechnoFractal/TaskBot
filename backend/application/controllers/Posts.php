@@ -2,6 +2,8 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use Doctrine\Common\Collections\Criteria;
+
 /**
  * Description of Posts
  *
@@ -9,25 +11,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Posts extends REST_Controller 
 {
+	private function getCriteria(int $id) : Criteria
+	{
+		return Criteria::create()
+			->where(Criteria::create()->expr()->eq('deleted', false))
+			->andWhere(Criteria::create()->expr()->eq('id', $id));	
+	}
+	
 	public function index_delete(int $id)
 	{		
 		$orm = DoctrineORM::getORM();
 
 		/* @var $post orm\Post */
 		$post = $orm
-				->getRepository(orm\Post::class)
-				->find($id);
+			->getRepository(orm\Post::class)
+			->matching($this->getCriteria($id))
+			->first();
 
 		if ($post) {
-			$result = $post->toResult();
-			$orm->remove($post);
+			$post->delete();
 			$orm->flush();
+			$result = $post->toResult();			
 			
 			$this->set_response($result, REST_Controller::HTTP_OK);
 		} else {
 			$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
 		}
-		
 	}
 	
 	public function index_put($id)
@@ -46,12 +55,13 @@ class Posts extends REST_Controller
 			return;
 		}
 		
-		$orm = DoctrineORM::getORM();
-			
+		$orm = DoctrineORM::getORM();			
+		
 		/* @var $post orm\Post */
 		$post = $orm
 			->getRepository(orm\Post::class)
-			->find($id);
+			->matching($this->getCriteria($id))
+			->first();
 		
 		/* @var $category orm\Category */
 		$category = $orm
@@ -109,7 +119,7 @@ class Posts extends REST_Controller
 		$orm->persist($post);
 		$orm->flush();
 		
-		Postinformer::informRequesters($orm, $post);
+		libraries\Postinformer::informRequesters($orm, $post);
 		
 		$id = $post->getId();
 		$result = $post->toResult();
@@ -124,14 +134,16 @@ class Posts extends REST_Controller
 	
 	public function index_get($id = null)
 	{
+		//die("test");
 		$orm = DoctrineORM::getORM();
 		
 		if ($id)
-		{
+		{			
 			/* @var $post orm\Post */
 			$post = $orm
 				->getRepository(orm\Post::class)
-				->find($id);
+				->matching($this->getCriteria($id))
+				->first();
 			
 			$result = [];
 			
@@ -150,16 +162,20 @@ class Posts extends REST_Controller
 			//print_r($filter); die();
 			
 			$repo = $orm->getRepository(orm\Post::class);
-			$resp = Telecriteria::getData(
-				$sort, 
-				$range, 
-				$filter, 
-				$repo,
-				new adapters\Post()
-			);
+			//var_dump($repo); die();
+			$telecriteria = new libraries\Telecriteria($repo, new adapters\Post());
+			$telecriteria->setSort($sort);
+			$telecriteria->setRange($range);
+			$telecriteria->setFilter($filter);
+			$telecriteria->compile();
 			
-			$posts = $resp[0];
-			$suffix = $resp[1];
+			/* @var $criteria Criteria */
+			$criteria = $telecriteria->getCriteria();
+			$criteria->andWhere(Criteria::expr()->eq('deleted', false));
+			
+			$posts = $telecriteria->getData();
+			$suffix = $telecriteria->getSuffix();
+			
 			$respHeader = "Content-Range: posts $suffix";
 			
 			$result = [];

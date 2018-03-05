@@ -11,6 +11,7 @@ import UserIcon from 'material-ui/svg-icons/social/person';
 import SessionIcon from 'material-ui/svg-icons/social/poll';
 import CategoryIcon from 'material-ui/svg-icons/action/assessment';
 import RequesterIcon from 'material-ui/svg-icons/social/group';
+import DeletedIcon from 'material-ui/svg-icons/action/delete';
 import Dashboard from './Dashboard';
 import authClient from './authClient';
 import { CategoryList, CategoryEdit } from './categories';
@@ -18,6 +19,7 @@ import { PostList, PostEdit, PostCreate } from './posts';
 import { UserList } from './users';
 import { SessionList } from './sessions';
 import { RequesterList } from './requesters';
+import { DeletedList, DeletedShow } from './deleted';
 
 const httpClient = (url, options = {}) => {
     if (!options.headers) {
@@ -62,7 +64,14 @@ const App = () => (
 			icon={SessionIcon}
 			name="sessions" 
 			list={SessionList} 
-			remove={Delete} />					
+			remove={Delete} />
+		<Resource 
+			icon={DeletedIcon}
+			name="deleted"
+			options={{ label: 'Deleted' }}
+			list={DeletedList} 
+			show={DeletedShow}
+			remove={Delete} />
 	</Admin>
 );
 

@@ -36,16 +36,19 @@ class Requesters extends REST_Controller
 		//print_r($filter); die();
 
 		$repo = $orm->getRepository(orm\Requester::class);
-		$resp = Telecriteria::getData(
-			$sort, 
-			$range, 
-			$filter, 
-			$repo,
+		$telecriteria = new libraries\Telecriteria(
+			$repo, 
 			new adapters\Requester()
 		);
+		
+		$telecriteria->setRange($range);
+		$telecriteria->setFilter($filter);
+		$telecriteria->setSort($sort);
+		
+		$telecriteria->compile();
 
-		$requesters = $resp[0];
-		$suffix = $resp[1];
+		$requesters = $telecriteria->getData();
+		$suffix = $telecriteria->getSuffix();
 		$respHeader = "Content-Range: posts $suffix";
 
 		$result = [];

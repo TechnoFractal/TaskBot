@@ -62,16 +62,19 @@ class Sessions extends REST_Controller
 			//print_r($filter); die();
 			
 			$repo = $orm->getRepository(orm\Session::class);
-			$resp = Telecriteria::getData(
-				$sort, 
-				$range, 
-				$filter, 
-				$repo,
+			$telecriteria = new libraries\Telecriteria(
+				$repo, 
 				new adapters\Session()
 			);
 			
-			$sessions = $resp[0];
-			$suffix = $resp[1];
+			$telecriteria->setFilter($filter);
+			$telecriteria->setRange($range);
+			$telecriteria->setSort($sort);
+			
+			$telecriteria->compile();
+			
+			$sessions = $telecriteria->getData();
+			$suffix = $telecriteria->getSuffix();
 			$respHeader = "Content-Range: posts $suffix";
 			
 			$result = [];

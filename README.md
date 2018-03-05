@@ -45,6 +45,46 @@ BotFather.
 You cat create tokens.txt at root of project and save there your tokens.  
 It is ignored by git.
 
+## PHP
+
+Install main php package and all what you need for build the dependencies:
+
+```
+sudo apt-get install \
+php7.0 \
+php7.0-curl \
+php7.0-json \
+php7.0-mbstring \
+php7.0-mysql \
+php7.0-dev \
+php-pear \
+build-essential \
+```
+
+Then install gender module:
+
+```
+sudo pecl install gender
+```
+
+Edit `/etc/php/7.?/mods-available/gender.ini` file and add there:
+
+```
+extension=gender.so
+```
+
+Then enable the module:  
+
+```
+sudo phpenmod gender
+```
+
+Navigate to `/backed/gender` folder, and run from there:
+
+```
+pear run-scripts pecl/gender
+```
+
 ## Git
 
 Clone the project some where it can be accessed for Apache2 and Nginx

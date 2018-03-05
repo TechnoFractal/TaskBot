@@ -23,6 +23,13 @@ class Post implements Restable
     protected $id;
 
 	/**
+	 *
+	 * @var boolean
+	 * @Column(type="boolean")
+	 */
+	protected $deleted = false;	
+	
+	/**
      * @var Category
 	 * @ManyToOne(targetEntity="Category", inversedBy="categories")
      **/
@@ -90,6 +97,21 @@ class Post implements Restable
     {
         return $this->text;
     }
+	
+	public function delete() 
+	{
+		$this->deleted = true;
+	}
+	
+	public function restore() 
+	{
+		$this->deleted = false;
+	}
+	
+	public function isDeleted() : bool 
+	{
+		return $this->deleted;
+	}
 
 	public function toResult(): array {
 		return [
@@ -97,7 +119,8 @@ class Post implements Restable
 			'title' => $this->getTitle(),
 			'text' => $this->getText(),
 			'created' => $this->getCreated()->format('Y-m-d'),
-			'categoryId' => $this->getCategory()->getId()
+			'categoryId' => $this->getCategory()->getId(),
+			'deleted' => (bool)$this->isDeleted()
 		];	
 	}
 }

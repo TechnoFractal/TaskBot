@@ -15,8 +15,12 @@
 /admin/node_modules/
 /admin/build/
 /admin/shared/
+
 /backend/vendor/
 /backend/config.yml
+/backend/gender/*
+!/backend/gender/index.html
+
 /ci
 
 /tokens.txt

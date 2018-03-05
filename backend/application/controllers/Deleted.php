@@ -6,33 +6,44 @@
  * and open the template in the editor.
  */
 
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+use Doctrine\Common\Collections\Criteria;
+
 /**
- * Description of Users
+ * Description of Deleted
  *
  * @author Olga Pshenichnikova <olga@technofractal.org>
  */
-class Users extends REST_Controller 
+class Deleted extends REST_Controller 
 {
+	private function getCriteria(int $id) : Criteria
+	{
+		return Criteria::create()
+			->where(Criteria::create()->expr()->eq('deleted', true))
+			->andWhere(Criteria::create()->expr()->eq('id', $id));	
+	}
+	
 	public function index_delete(int $id)
 	{		
 		$orm = DoctrineORM::getORM();
 
-		/* @var $post orm\User */
+		/* @var $post orm\Post */
 		$post = $orm
-				->getRepository(orm\User::class)
-				->find($id);
+			->getRepository(orm\Post::class)
+			->matching($this->getCriteria($id))
+			->first();
 
 		if ($post) {
-			$result = $post->toResult();
-			$orm->remove($post);
+			$post->restore();
 			$orm->flush();
+			$result = $post->toResult();			
 			
 			$this->set_response($result, REST_Controller::HTTP_OK);
 		} else {
 			$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
 		}
-		
-	}
+	}	
 	
 	public function index_get($id = null)
 	{
@@ -40,16 +51,17 @@ class Users extends REST_Controller
 		
 		if ($id)
 		{
-			/* @var $user orm\User */
-			$user = $orm
-				->getRepository(orm\User::class)
-				->find($id);
+			/* @var $post orm\Post */
+			$post = $orm
+				->getRepository(orm\Post::class)
+				->matching($this->getCriteria($id))
+				->first();
 			
 			$result = [];
 			
-			if ($user)
+			if ($post)
 			{
-				$result = $user->toResult();
+				$result = $post->toResult();
 				$this->set_response($result, REST_Controller::HTTP_OK);
 			} else {
 				$this->set_response(null, REST_Controller::HTTP_NOT_FOUND);
@@ -61,28 +73,31 @@ class Users extends REST_Controller
 			
 			//print_r($filter); die();
 			
-			$repo = $orm->getRepository(orm\User::class);
+			$repo = $orm->getRepository(orm\Post::class);
 			$telecriteria = new libraries\Telecriteria(
 				$repo, 
-				new adapters\User()
+				new adapters\Post()
 			);
 			
 			$telecriteria->setFilter($filter);
 			$telecriteria->setRange($range);
 			$telecriteria->setSort($sort);
-			
 			$telecriteria->compile();
 			
-			$users = $telecriteria->getData();
+			/* @var $criteria Criteria */
+			$criteria = $telecriteria->getCriteria();
+			$criteria->andWhere(Criteria::expr()->eq('deleted', true));
+			
+			$posts = $telecriteria->getData();
 			$suffix = $telecriteria->getSuffix();
 			$respHeader = "Content-Range: posts $suffix";
 			
 			$result = [];
 			
-			/* @var $user orm\User */
-			foreach ($users as $user)
+			/* @var $post orm\Post */
+			foreach ($posts as $post)
 			{
-				$result[] = $user->toResult();
+				$result[] = $post->toResult();
 			}
 			
 			$this->output->set_header($respHeader);

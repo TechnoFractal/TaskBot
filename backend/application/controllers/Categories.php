@@ -86,16 +86,19 @@ class Categories extends REST_Controller
 			//print_r($filter); die();
 			
 			$repo = $orm->getRepository(orm\Category::class);
-			$resp = Telecriteria::getData(
-				$sort, 
-				$range, 
-				$filter, 
-				$repo,
+			$telecriteria = new libraries\Telecriteria(
+				$repo, 
 				new adapters\Category()
 			);
 			
-			$categories = $resp[0];
-			$suffix = $resp[1];
+			$telecriteria->setFilter($filter);
+			$telecriteria->setRange($range);
+			$telecriteria->setSort($sort);
+			$telecriteria->compile();
+			
+			$categories = $telecriteria->getData();
+			$suffix = $telecriteria->getSuffix();
+			
 			$respHeader = "Content-Range: posts $suffix";
 			
 			$result = [];
