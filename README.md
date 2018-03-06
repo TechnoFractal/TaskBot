@@ -58,10 +58,15 @@ php7.0-mbstring \
 php7.0-mysql \
 php7.0-dev \
 php-pear \
-build-essential \
+build-essential
 ```
 
-Then install gender module:
+## Gender
+
+Bot can determine gender of a requester.  
+It uses php [gender][1] pear dependency.
+
+Install the dependency:
 
 ```
 sudo pecl install gender
@@ -73,17 +78,22 @@ Edit `/etc/php/7.?/mods-available/gender.ini` file and add there:
 extension=gender.so
 ```
 
-Then enable the module:  
+Then enable the module and restart the server:  
 
 ```
 sudo phpenmod gender
+sudo service apache2 restart
 ```
 
-Navigate to `/backed/gender` folder, and run from there:
+Create folder for the dictionary in `/opt/gender` and navigate there, 
+than run follow command.  
+Type `.` for the dictionary location:  
 
 ```
 pear run-scripts pecl/gender
 ```
+
+**TODO: connect dictionary to the flow**
 
 ## Git
 
@@ -626,3 +636,5 @@ Good evening: {name}
 * https://dev.mysql.com/doc/refman/5.7/en/charset-applications.html
 * https://scottlinux.com/2011/03/04/rotate-mysql-backups-with-logrotate/
 * https://rclone.org/
+
+[1]: https://www.sitepoint.com/theres-a-gender-extension-for-php/
