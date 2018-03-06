@@ -29,14 +29,55 @@ use \Doctrine\ORM\EntityManager;
  * @author Olga Pshenichnikova <olga@technofractal.org>
  */
 class TasksQueue 
-{	
-	private function getRequester(
-		int $teleId,
-		EntityManager $orm
-	) : \orm\Requester
+{		
+	/**
+	 *
+	 * @var RequesterData 
+	 */
+	private $data;
+	
+	/**
+	 *
+	 * @var bool
+	 */
+	private $queueEmpty = false;
+	
+	/**
+	 *
+	 * @var \orm\Post
+	 */
+	private $post;
+	
+	public function __construct(RequesterData $data) 
+	{
+		$this->data = $data;
+	}
+	
+	private function setEmpty()
+	{
+		$this->queueEmpty = true;
+	}
+	
+	private function setPost(\orm\Post $post)
+	{
+		$this->queueEmpty = false;
+		$this->post = $post;
+	}
+	
+	public function isEmpty() : bool
+	{
+		return $this->queueEmpty;
+	}
+	
+	private function checkRequester(EntityManager $orm) 
+		: \orm\Requester
 	{
 		$expr = Criteria::expr();		
 		
+		/* @var $data RequesterData */
+		$data = $this->data;
+		
+		$teleId = $data->getId();
 		$criteria = Criteria::create();
 		$criteria->where($expr->eq("tele_id", $teleId));
 		
@@ -47,7 +88,17 @@ class TasksQueue
 		
 		if (!$requester)
 		{
-			return new \orm\Requester();
+			$requester = new \orm\Requester();
+			
+			$requester->setIsBot($data->getIsBot());
+			$requester->setTeleId($data->getId());
+			$requester->setChatId($data->getChatId());
+			$requester->setFirstName($data->getFirstName());
+			$requester->setLastName($data->getLastName());
+			$requester->setUserName($data->getUserName());
+
+			$orm->persist($requester);
+			$orm->flush();
 		}
 		
 		return $requester;
@@ -72,32 +123,42 @@ class TasksQueue
 		return $category;
 	}
 	
-	public function handleRequest(
-		string $request, 
-		RequesterData $data) : string
+	public function getPost() : \orm\Post
 	{
-		//error_log('here ' . $request); die();
+		return $this->post;
+	}
+	
+	public function start()
+	{
+		/* @var $requester \orm\Requester */
+		$orm = \DoctrineORM::getORM();
+
+		/* @var $requester \orm\Requester */
+		$requester = $this->checkRequester($orm);
+		$requester->enable();
+		$orm->flush();
+	}
+	
+	public function stop()
+	{
+		/* @var $requester \orm\Requester */
+		$orm = \DoctrineORM::getORM();
 		
+		/* @var $requester \orm\Requester */
+		$requester = $this->checkRequester($orm);
+		$requester->disable();
+		$orm->flush();
+	}
+	
+	public function handleRequest(string $request) : string
+	{		
+		/* @var $requester \orm\Requester */
 		$orm = \DoctrineORM::getORM();
 		
 		$category = $this->getCategory($request, $orm);
 		
 		/* @var $requester \orm\Requester */
-		$requester = $this->getRequester($data->getId(), $orm);
-		
-		$requester->setIsBot($data->getIsBot());
-		$requester->setTeleId($data->getId());
-		$requester->setChatId($data->getChatId());
-		$requester->setFirstName($data->getFirstName());
-		$requester->setLastName($data->getLastName());
-		$requester->setUserName($data->getUserName());
-			
-		if (!$requester->isLoaded())
-		{
-			$orm->persist($requester);
-		}
-		
-		$orm->flush();
+		$requester = $this->checkRequester($orm);
 		
 		$expr = Criteria::expr();
 		$criteria = Criteria::create();
@@ -139,8 +200,10 @@ class TasksQueue
 				$orm->persist($queuepointer);
 				$orm->flush();
 				
+				$this->setPost($post);
 				return $post->getText();
 			} else {
+				$this->setEmpty();
 				return DataHelper::getNoTasks($request);
 			}
 		} else {
@@ -166,12 +229,14 @@ class TasksQueue
 				$queuepointer->setPost($post);
 				$orm->flush();
 				
+				$this->setPost($post);
 				return $post->getText();
 			} else {
 				$queuepointer->setIsLast();
 				$orm->flush();
 				
 				//error_log($request);
+				$this->setEmpty();
 				return DataHelper::getNoTasks($request);
 			}
 		}

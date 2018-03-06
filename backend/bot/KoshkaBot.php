@@ -20,8 +20,7 @@
 
 namespace bot;
 
-use \Telegram\Bot\Api;
-use \Telegram\Bot\Objects\User;
+use \Telegram\Bot\BotApi;
 use \Telegram\Bot\Objects\Update;
 use \Telegram\Bot\Objects\Message;
 
@@ -31,152 +30,133 @@ use \Telegram\Bot\Objects\Message;
  * @author Olga Pshenichnikova <olga@technofractal.org>
  */
 class KoshkaBot 
-{
-	private function getUserName(User $user)
+{	
+	/**
+	 *
+	 * @var Api
+	 */
+	private $api;
+	
+	/**
+	 *
+	 * @var \Config
+	 */
+	private $config;
+	
+	public function __construct(\Config $config) 
 	{
-		$firstname = $user->getFirstName();
-		$lastname = $user->getLastName();
-		$username = $user->getUsernameName();
-		
-		$name = "Неизвестный";
-			
-		if ($firstname || $lastname) {
-			if ($firstname) {
-				$name = $firstname;
-			}
-
-			if ($lastname) {
-				$name .= " " . $lastname;
-			}
-		} else if ($username) {
-			$name = $username;
-		}
-		
-		return $name;
+		$this->config = $config;
+		$this->api = new BotApi($config->getToken());
 	}
 	
-	public function handleRequest(Api $api) : bool
+	public function handleUpdate()
 	{
+		/* @var $api Api */
+		$api = $this->api;
+		
 		/* @var $result Update */
-		$result = $api->getWebhookUpdates();
+		$result = $api->getWebhookUpdates();		
 		
-		/* @var $result Message */
-		$message = $result->getMessage();
-		
-		if (!$message)
-		{
+		if ($result->getMessage()) {
+			/* @var $message Message */
+			$message = $result->getMessage();
+			$this->handleMessage($message);
+		} else if ($result->get("callback_query")) {
+			/* @var $query Update */
+			$query = $result->get("callback_query");
+			$this->handleQuery($query);
+		} else {
 			error_log("Invalid request");
-			return false;
 		}
+	}
+	
+	public function handleQuery(Update $query)
+	{		
+		/* @var $api BotApi */
+		$api = $this->api;
+		$data = explode(':', $query->get("data"));
 		
-		$config = new \Config();
+		if (count($data) == 2) {
+			$text = sprintf("Действие: %s, Пост: %d", $data[1], $data[0]);
+
+			$params = [
+				'callback_query_id'		=> $query->get('id'),
+				'text'					=> $text
+			];
+
+			$api->answerCallbackQuery($params);
+		} else {
+			error_log($query->get("data"));
+		}
+	}
+	
+	public function handleMessage(Message $message)
+	{
+		/* @var $api Api */
+		$api = $this->api;
+
+		/* @var $config \Config */
+		$config = $this->config;
 		
-		/* @var $botId int */
-		$botId = $config->getBotId();
-		
-		/* @var $chat_id int */
-		$chat_id = $message->getChat()->getId();
-		
-		/* @var $newUser User */
-		$newUser = $message->getNewChatParticipant();
-		
-		/* @var $leftUser User */
-		$leftUser = $message->getLeftChatParticipant();
-		
-		/* @var $text string */
-		$text = $message->getText();
-		/* @var $fromUser User */
-		$fromUser = $message->getFrom();
-		
-		//Клавиатура
-		$keyboard = [
-			[DataHelper::LIGHT_TASKS],
-			[DataHelper::MIDDLE_TASKS],
-			[DataHelper::HARD_TASKS],
-			[DataHelper::INFO],
-			[DataHelper::CONTACT]
-		];
-		
-		if ($newUser && $newUser->getId() == $botId)
-		{			
-			$api->sendMessage([ 
-				'chat_id' => $chat_id, 
-				'parse_mode' => 'HTML',
-				'text' => DataHelper::getHello()
-			]);
-		} else if ($newUser && $newUser->getId() !== $botId) {
-			$name = $this->getUserName($newUser);
-			
-			$api->sendMessage([ 
-				'chat_id' => $chat_id, 
-				'parse_mode' => 'HTML',
-				'text' => DataHelper::getHi($name)
-			]);
-		} else if ($leftUser) {
-			$name = $this->getUserName($leftUser);
-			$isMale = !DataHelper::getIsFemale($leftUser);
-			
-			$api->sendMessage([ 
-				'chat_id' => $chat_id, 
-				'parse_mode' => 'HTML',
-				'text' => DataHelper::getBye($name, $isMale)
-			]);
-		} else if ($text) {
-			 if ($text == "/start") {
-				$reply_markup = $api->replyKeyboardMarkup([ 
-					'keyboard' => $keyboard, 
-					'resize_keyboard' => true, 
-					'one_time_keyboard' => false 
-				]);
-				
-				$api->sendMessage([ 
-					'chat_id' => $chat_id, 
-					'parse_mode' => 'HTML',
-					'text' => DataHelper::getStart(),
-					'reply_markup' => $reply_markup 
-				]);
-			} elseif ($text == "/help" || $text == DataHelper::INFO) {
-				$api->sendMessage([ 
-					'chat_id' => $chat_id, 
-					'parse_mode' => 'HTML',
-					'text' => DataHelper::getInfo()
-				]);
-			} elseif ($text == DataHelper::CONTACT) {
-				$api->sendMessage([ 
-					'chat_id' => $chat_id, 
-					'parse_mode' => 'HTML',
-					'text' => DataHelper::getContacts()
-				]);
-			} else if (
-				$text == DataHelper::LIGHT_TASKS ||
-				$text == DataHelper::MIDDLE_TASKS ||
-				$text == DataHelper::HARD_TASKS) {
-				$tasksQueue = new TasksQueue();
-				
-				$requesterData = new RequesterData($message);
-				$respText = $tasksQueue->handleRequest($text, $requesterData);
-				
-				$api->sendMessage([ 
-					'chat_id' => $chat_id, 
-					'parse_mode' => 'HTML',
-					'text' => $respText
-				]);
-			} else {
-				$isMale = !DataHelper::getIsFemale($fromUser);
-				
-				$api->sendMessage([ 
-					'chat_id' => $chat_id, 
-					'parse_mode'=> 'HTML', 
-					'text' => DataHelper::getNotFound($isMale) 
-				]);
+		/* @var $commands Commands */
+		$commands = new Commands($config, $api, $message);
+
+		if ($message->getNewChatParticipant()) {		
+			$commands->hello();
+		} else if ($message->getLeftChatParticipant()) {
+			$commands->bye();
+		} else if ($message->getSticker()) {
+			$commands->sticker();
+		} else if ($message->get('pinned_message')) {
+			$commands->pin();
+		} else if ($message->get('successful_payment')) {
+			$commands->wtf();
+		} else if ($message->get('invoice')) {
+			$commands->wtf();
+		} else if ($message->get('migrate_from_chat_id')) {
+			$commands->wtf();
+		} else if ($message->get('migrate_to_chat_id')) {
+			$commands->wtf();
+		} else if ($message->get('channel_chat_created')) {
+			$commands->wtf();
+		} else if ($message->get('supergroup_chat_created')) {
+			$commands->wtf();
+		} else if ($message->get('group_chat_created')) {
+			$commands->wtf();
+		} else if ($message->get('delete_chat_photo')) {
+			$commands->wtf();
+		} else if ($message->get('new_chat_photo')) {
+			$commands->wtf();
+		} else if ($message->get('new_chat_title')) {
+			$commands->wtf();
+		} else if ($message->getText()) {
+			/* @var $text string */
+			$text = $message->getText();
+
+			switch ($text) {
+				case "/start":
+					$commands->start();
+					break;
+				case "/stop":
+					$commands->stop();
+					break;
+				case "/help":
+				case DataHelper::INFO:
+					$commands->info();
+					break;
+				case DataHelper::CONTACT:
+					$commands->contacts();
+					break;
+				case DataHelper::LIGHT_TASKS:
+				case DataHelper::MIDDLE_TASKS:
+				case DataHelper::HARD_TASKS:
+					$commands->task();
+					break;
+				default:
+					$commands->idontunderstand();
 			}
 		} else {
-			$api->sendMessage([ 
-				'chat_id' => $chat_id, 
-				'text' => DataHelper::getDefault()
-			]);
+			$commands->idontknow();
 		}
-		
-		return true;
 	}
 }

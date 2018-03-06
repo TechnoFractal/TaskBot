@@ -14,6 +14,9 @@ export const RequesterList = (props) => (
 			<BooleanField 
 				label="Is bot?"
 				source="isBot" />
+			<BooleanField 
+				label="Enabled?"
+				source="enabled" />				
 			<TextField 
 				label="First Name"
 				source="firstName" />

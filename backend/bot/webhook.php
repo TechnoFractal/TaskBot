@@ -2,18 +2,14 @@
 
 include('../vendor/autoload.php');
 
-use Telegram\Bot\Api;
-
+/* @var $config Config */
 $config = new Config();
-$api = new Api($config->getToken());
-
-$koshkaBot = new bot\KoshkaBot();
+$koshkaBot = new bot\KoshkaBot($config);
 
 try {
-	//error_log("WTF!!!?"); die();
-	$koshkaBot->handleRequest($api);
+	$koshkaBot->handleUpdate();
 } catch (Exception $e) {
 	error_log($e->getMessage());
 	error_log($e->getTraceAsString());
-	echo $e->getMessage();
+	//echo $e->getMessage();
 }

@@ -76,6 +76,27 @@ class Requester implements Restable
      */
     protected $username;
 	
+	/**
+     * @var boolean
+	 * @Column(type="boolean")
+     */
+	protected $enabled = true;
+	
+	public function isEnabled() : bool
+	{
+		return $this->enabled;
+	}
+	
+	public function enable()
+	{
+		$this->enabled = true;
+	}
+
+	public function disable()
+	{
+		$this->enabled = false;
+	}
+	
 	public function isLoaded() : bool
 	{
 		return (bool)$this->id;
@@ -155,9 +176,7 @@ class Requester implements Restable
 			'firstName' => $this->getFirstName(),
 			'lastName' => $this->getLastName(),
 			'userName' => $this->getUserName(),
-			//'accessDate' => $this->getDate()->format("Y-m-d"),
-			//'categoryId' => $this->getCategory()->getId(),
-			//'postId' => $this->getPost()->getId()
+			'enabled' => $this->isEnabled()
 		];
 	}
 }

@@ -3,7 +3,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 use Doctrine\Common\Collections\Criteria;
-
+use libraries\Postinformer;
 /**
  * Description of Posts
  *
@@ -119,14 +119,18 @@ class Posts extends REST_Controller
 		$orm->persist($post);
 		$orm->flush();
 		
-		libraries\Postinformer::informRequesters($orm, $post);
+		/* @var $config Config */
+		$config = new Config();
+		
+		/* @var $postinformer Postinformer */
+		$postinformer = new Postinformer($config);
+		
+		$postinformer->informRequesters($orm, $post);
 		
 		$id = $post->getId();
 		$result = $post->toResult();
 		
 		$respHeader = "Location: /posts/$id";
-			
-		//print_r((array)$result); die();
 
 		$this->output->set_header($respHeader);
 		$this->set_response($result, REST_Controller::HTTP_CREATED);

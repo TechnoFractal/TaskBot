@@ -37,8 +37,10 @@ class DataHelper
 	const FILE_HI = "hi";
 	const FILE_BYE = "bye";
 	const FILE_START = "start";
+	const FILE_STOP = "stop";
 	const FILE_INFO = "info";
 	const FILE_CONTACTS = "contacts";
+	const FILE_PIN = "pin";
 	const FILE_NOTASKS = "notasks";
 	const FILE_NEWTASKS = "newtask";	
 	
@@ -192,6 +194,16 @@ class DataHelper
 	public static function getStart() : string
 	{
 		return self::getData(self::FILE_START);
+	}
+	
+	public static function getStop() : string
+	{
+		return self::getData(self::FILE_STOP);
+	}
+	
+	public static function getPin() : string
+	{
+		return self::getData(self::FILE_PIN);
 	}
 	
 	public static function getInfo() : string

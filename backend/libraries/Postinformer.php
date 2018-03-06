@@ -11,6 +11,7 @@ namespace libraries;
 use \Doctrine\ORM\EntityManager;
 use \Telegram\Bot\Api;
 use \Telegram\Bot\Exceptions\TelegramResponseException;
+use \Doctrine\Common\Collections\Criteria;
 
 /**
  * Description of Postinformer
@@ -19,31 +20,42 @@ use \Telegram\Bot\Exceptions\TelegramResponseException;
  */
 class Postinformer 
 {
-	public static function informRequesters(
-		EntityManager $orm,
-		\orm\Post $post
-	) {
-		$config = new \Config();
+	/**
+	 *
+	 * @var Api
+	 */
+	private $api;
+	
+	public function __construct(\Config $config) 
+	{
 		$token = $config->getToken();
-		$api = new Api($token);		
+		$this->api = new Api($token);
+	}
+	
+	private function sendMessage(int $chatId, string $text)
+	{
+		try {
+			$this->api->sendMessage([ 
+				'chat_id' => $chatId,
+				'parse_mode' => 'HTML',
+				'text' => $text
+			]);
+		} catch (TelegramResponseException $e) {
+			error_log($e->getMessage());
+		}
+	}
+	
+	public function informRequesters(EntityManager $orm, \orm\Post $post)
+	{
+		$expr = Criteria::expr();		
 		
-		//$expr = Criteria::expr();		
-		
-		//$criteria = Criteria::create();
-		//$criteria
-		//	->where($expr->eq("isLast", true))
-		//	->andWhere($expr->eq("category", $post->getCategory()));
-		
-		/* @var $queuepointers array */
-		//$queuepointers = $orm
-		//	->getRepository(\orm\Queuepointer::class)
-		//	->matching($criteria)
-		//	->toArray();
+		$criteria = Criteria::create()->where($expr->eq("enabled", true));
 		
 		/* @var $queuepointers array */
 		$requesters = $orm
 			->getRepository(\orm\Requester::class)
-			->findAll();
+			->matching($criteria)
+			->toArray();
 			
 		/* @var $requester orm\Requester */
 		foreach ($requesters as $requester)
@@ -55,15 +67,7 @@ class Postinformer
 			
 			if ($chatId)
 			{			
-				try {
-					$api->sendMessage([ 
-						'chat_id' => $chatId,
-						'parse_mode' => 'HTML',
-						'text' => $text
-					]);
-				} catch (TelegramResponseException $e) {
-					error_log($e->getMessage());
-				}
+				$this->sendMessage($chatId, $text);
 			}
 		}
 	}
