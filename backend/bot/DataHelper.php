@@ -20,6 +20,9 @@
 
 namespace bot;
 
+use \Gender\Gender;
+use \Telegram\Bot\Objects\User;
+
 class DataHelper
 {
 	const LIGHT_TASKS = "Легкие задания";
@@ -38,6 +41,84 @@ class DataHelper
 	const FILE_CONTACTS = "contacts";
 	const FILE_NOTASKS = "notasks";
 	const FILE_NEWTASKS = "newtask";	
+	
+	private static function isMale(string $name) : bool
+	{
+		switch($name) {
+			case Gender::IS_FEMALE:
+				return false;
+			case Gender::IS_MOSTLY_FEMALE:
+				return false;
+			case Gender::IS_MALE:
+				return true;
+			case Gender::IS_MOSTLY_MALE:
+				return true;
+			case Gender::IS_UNISEX_NAME:
+				return true;
+			case Gender::IS_A_COUPLE:
+				return true;
+			case Gender::NAME_NOT_FOUND:
+				return false;
+			case Gender::ERROR_IN_NAME:
+				return false;
+			default:
+				return false;
+		}
+	}
+	
+	private static function isGenderize(string $name) 
+	{
+		switch($name) {
+			case Gender::IS_FEMALE:
+				return true;
+			case Gender::IS_MOSTLY_FEMALE:
+				return true;
+			case Gender::IS_MALE:
+				return true;
+			case Gender::IS_MOSTLY_MALE:
+				return true;
+			case Gender::IS_UNISEX_NAME:
+				return true;
+			case Gender::IS_A_COUPLE:
+				return true;
+			case Gender::NAME_NOT_FOUND:
+				return false;
+			case Gender::ERROR_IN_NAME:
+				return false;
+			default:
+				return false;
+		}		
+	}
+	
+	public static function getIsFemale(User $user) : bool {
+		$name = $user->getFirstName() ? $user->getFirstName() : "";
+		$family = $user->getLastName() ? $user->getLastName() : "";
+		$username = $user->getUsername() ? $user->getUsername() : "";
+		
+		$gender = new Gender();
+		$nameResult = $gender->get($name, Gender::RUSSIA);
+		$familyResult = $gender->get($family, Gender::RUSSIA);
+		$usernameResult = $gender->get($username, Gender::RUSSIA);
+		
+		if (self::isGenderize($nameResult) || 
+			self::isGenderize($familyResult) || 
+			self::isGenderize($usernameResult)) 
+		{
+			return 
+				(self::isGenderize($nameResult) && 
+					!self::isMale($nameResult)) ||
+				(self::isGenderize($familyResult) && 
+					!self::isMale($familyResult)) ||
+				(self::isGenderize($usernameResult) && 
+					!self::isMale($usernameResult));
+		} else {
+			return (
+				mb_substr($name, -1) ==  'а' ||
+				mb_substr($family, -1) ==  'а' ||
+				mb_substr($username, -1) ==  'а'
+			);
+		}
+	}
 	
 	public static function getCategoryId(string $request) : int
 	{
@@ -79,10 +160,11 @@ class DataHelper
 		return self::getData(self::FILE_DEFAULT);
 	}
 	
-	public static function getNotFound(string $query) : string
+	public static function getNotFound(bool $isMale) : string
 	{
 		$text = self::getData(self::FILE_NOTFOUND);
-		return str_replace('{request}', $query, $text);
+		$gender = $isMale ? 'Молодой человек' : 'Уважаемая дама';
+		return str_replace('{gender}', $gender, $text);
 	}
 	
 	public static function getHi(string $username) : string
@@ -91,10 +173,15 @@ class DataHelper
 		return str_replace('{username}', $username, $text);
 	}
 	
-	public static function getBye(string $username) : string
+	public static function getBye(string $username, bool $isMale) : string
 	{
 		$text = self::getData(self::FILE_BYE);
-		return str_replace('{username}', $username, $text);
+		$pronomen = $isMale ? 'он' : 'она';
+		$leave = $isMale ? 'ушёл' : 'ушла';
+		
+		$text = str_replace('{username}', $username, $text);
+		$text = str_replace('{pronomen}', $pronomen, $text);
+		return str_replace('{leave}', $leave, $text);
 	}
 	
 	public static function getHello() : string

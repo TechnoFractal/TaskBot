@@ -85,6 +85,8 @@ class KoshkaBot
 		
 		/* @var $text string */
 		$text = $message->getText();
+		/* @var $fromUser User */
+		$fromUser = $message->getFrom();
 		
 		//Клавиатура
 		$keyboard = [
@@ -112,11 +114,12 @@ class KoshkaBot
 			]);
 		} else if ($leftUser) {
 			$name = $this->getUserName($leftUser);
+			$isMale = !DataHelper::getIsFemale($leftUser);
 			
 			$api->sendMessage([ 
 				'chat_id' => $chat_id, 
 				'parse_mode' => 'HTML',
-				'text' => DataHelper::getBye($name)
+				'text' => DataHelper::getBye($name, $isMale)
 			]);
 		} else if ($text) {
 			 if ($text == "/start") {
@@ -158,11 +161,13 @@ class KoshkaBot
 					'parse_mode' => 'HTML',
 					'text' => $respText
 				]);
-			} else {				
+			} else {
+				$isMale = !DataHelper::getIsFemale($fromUser);
+				
 				$api->sendMessage([ 
 					'chat_id' => $chat_id, 
 					'parse_mode'=> 'HTML', 
-					'text' => DataHelper::getNotFound($text) 
+					'text' => DataHelper::getNotFound($isMale) 
 				]);
 			}
 		} else {
