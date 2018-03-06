@@ -70,12 +70,6 @@ class Telecriteria
 	
 	/**
 	 *
-	 * @var int
-	 */
-	private $from;
-	
-	/**
-	 *
 	 * @var string
 	 */
 	private $suffix;
@@ -119,8 +113,6 @@ class Telecriteria
 		/* @var $criteria Criteria */
 		$criteria = Criteria::create();
 		
-		$from = 0;
-		
 		if ($this->filter)
 		{
 			//$criteria->where($filter);
@@ -139,26 +131,26 @@ class Telecriteria
 			$criteria->orderBy($sorting);
 		}
 		
-		if ($this->range)
-		{
-			$from = $this->range[0];
-			$to = $this->range[1];
-			$criteria
-				->setFirstResult($from)
-				->setMaxResults($to - $from);
-		}
-		
-		$this->from = $from;
 		$this->criteria = $criteria;
 	}
 	
 	public function getData() : array
 	{		
-		$resp = $this->repo->matching($this->criteria)->toArray();
+		$from = 0;
 		$count = $this->repo->matching($this->criteria)->count();
-		$to = $this->from + $count;
-		$from = $this->from;
 		
+		if ($this->range)
+		{
+			$from = $this->range[0];
+			$to = $this->range[1];
+			$this->criteria
+				->setFirstResult($from)
+				->setMaxResults($to - $from);
+		}
+		
+		$resp = $this->repo->matching($this->criteria)->toArray();
+		
+		$to = $from + $count;		
 		$this->suffix = "$from-$to/$count";
 		
 		return $resp;

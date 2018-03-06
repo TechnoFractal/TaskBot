@@ -3,6 +3,7 @@
 *.lock
 *lock.json
 .~lock.*
+*.swp
 
 # NB
 /nbproject/
