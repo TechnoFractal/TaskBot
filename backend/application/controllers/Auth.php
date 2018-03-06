@@ -56,7 +56,7 @@ class Auth extends REST_Controller
 			$message = [
 				"error" => "X-Real-IP header is mising"
 			];
-			
+
 			$this->set_response(
 				$message, 
 				REST_Controller::HTTP_FAILED_DEPENDENCY
