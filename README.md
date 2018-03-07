@@ -20,6 +20,7 @@ On both we need:
 * Apache2 module - curl
 * Apache2 module - mysql
 * PHP 7.*
+* PECR
 * Composer
 * Doctrine
 * CodeIgniter
