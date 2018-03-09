@@ -611,7 +611,7 @@ curl \
 # Important info
 
 When you will create text will be used by the bot, put it in 
-`/backend/bot/data` directory. There you can split lines by CRLF, but it will  
+`/backend/bot/data` directory. There you can split lines by CRLF, but it will 
 joined by the application.
 For put new line (as br tag) use - "\r".  
 You also can use templates.  
