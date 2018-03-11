@@ -12,49 +12,30 @@ namespace orm;
  * Description of Queuepointer
  *
  * @author Olga Pshenichnikova <olga@technofractal.org>
- * @Entity 
- * @Table(
- *	name="queuepointers",
- *	uniqueConstraints={
- *		@UniqueConstraint(columns={"requester_id", "category_id"})
- *	}
- * )
+ * @Entity
  */
 class Queuepointer 
-{	
+{
 	/**
-     * @var int
-	 * @Id @Column(type="integer") @GeneratedValue
-     */
-    protected $id;
-	
-	/**
-     * @var Requester
-	 * @ManyToOne(targetEntity="Requester")
-	 * @JoinColumn(
-	 *	name="requester_id", 
-	 *	referencedColumnName="id", 
-	 *	onDelete="cascade"
-	 * )
+	 * @var Requester
+	 * @Id
+	 * @ManyToOne(targetEntity="Requester", inversedBy="requesters")
      **/
     protected $requester;
 
 	/**
-     * @var Post
-	 * @ManyToOne(targetEntity="Post", cascade={"remove"})
-	 * @JoinColumn(
-	 *	name="post_id", 
-	 *	referencedColumnName="id", 
-	 *	onDelete="cascade"
-	 * )
-     **/
-    protected $post;
-	
-	/**
      * @var Category
+	 * @Id
 	 * @ManyToOne(targetEntity="Category")
      **/
     protected $category;
+	
+	/**
+     * @var Post
+	 * @ManyToOne(targetEntity="Post")
+	 * @JoinColumn(onDelete="cascade")
+     **/
+    protected $post;
 	
 	/**
 	 * @var \DateTime
@@ -67,12 +48,7 @@ class Queuepointer
 	 * @var bool
 	 * @Column(type="boolean")
 	 */
-	protected $isLast;
-	
-	public function __construct() 
-	{
-		$this->isLast = false;
-	}
+	protected $isLast = false;
 	
 	public function getId() : int
 	{

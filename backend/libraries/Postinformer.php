@@ -67,6 +67,7 @@ class Postinformer
 			
 			if ($chatId)
 			{			
+				//error_log(sprintf("ChatId: %d -> %s", $chatId, $text));
 				$this->sendMessage($chatId, $text);
 			}
 		}

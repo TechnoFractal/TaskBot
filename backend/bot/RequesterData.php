@@ -20,7 +20,8 @@
 
 namespace bot;
 
-use \Telegram\Bot\Objects\Message;
+use \Telegram\Bot\Objects\User;
+use \Telegram\Bot\Objects\Chat;
 
 /**
  * Description of RequesterData
@@ -65,29 +66,24 @@ class RequesterData
 	 */
 	private $isBot;
 	
-	public function __construct(Message $message) 
+	public function __construct(User $user, Chat $chat)
 	{
-		//error_log(print_r($user, 1)); die();
-		$user = $message->getFrom();
 		$this->id = $user->getId();
-		$this->chatId = $message->getChat()->getId();
 		$this->firstName = $user->getFirstName();
-		
+		$this->isBot = $user->get("is_bot");
 		$this->lastName = "";
+		$this->userName = "";
+		$this->chatId = $chat->getId();
 		
 		if ($user->getLastName())
 		{
 			$this->lastName = $user->getLastName();
 		}
 		
-		$this->userName = "";
-		
 		if ($user->getUsername())
 		{
 			$this->userName = $user->getUsername();
 		}
-		
-		$this->isBot = $user->get("is_bot");
 	}
 	
 	public function getId() : int

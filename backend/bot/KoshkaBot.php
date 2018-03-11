@@ -24,6 +24,8 @@ use \Telegram\Bot\BotApi;
 use \Telegram\Bot\Objects\Update;
 use \Telegram\Bot\Objects\Message;
 
+use \constants\Constants;
+
 /**
  * Description of KoshkaBot
  *
@@ -42,7 +44,7 @@ class KoshkaBot
 	 * @var \Config
 	 */
 	private $config;
-	
+
 	public function __construct(\Config $config) 
 	{
 		$this->config = $config;
@@ -55,30 +57,63 @@ class KoshkaBot
 		$api = $this->api;
 		
 		/* @var $result Update */
-		$result = $api->getWebhookUpdates();		
+		$result = $api->getWebhookUpdates();
+		
+		//error_log(print_r($result->getRawResponse(), 1));
 		
 		if ($result->getMessage()) {
-			/* @var $message Message */
-			$message = $result->getMessage();
-			$this->handleMessage($message);
+			$this->handleMessage($result);
 		} else if ($result->get("callback_query")) {
-			/* @var $query Update */
-			$query = $result->get("callback_query");
-			$this->handleQuery($query);
+			$this->handleQuery($result);
 		} else {
 			error_log("Invalid request");
 		}
 	}
 	
-	public function handleQuery(Update $query)
+	public function handleQuery(Update $update)
 	{		
 		/* @var $api BotApi */
 		$api = $this->api;
+		
+		/* @var $config \Config */
+		$config = $this->config;
+		
+		/* @var $query Update */
+		$query = $update->get("callback_query");
+		
+		/* @var $commands Commands */
+		$commands = new CallbackCommands($query);
+		
 		$data = explode(':', $query->get("data"));
 		
-		if (count($data) == 2) {
-			$text = sprintf("Действие: %s, Пост: %d", $data[1], $data[0]);
-
+		if (count($data) == 2) 
+		{
+			/* @var $action string */
+			$action = $data[1];
+			/* @var $postId int */
+			$postId = $data[0];
+			
+			//$text = sprintf("Действие: %s, Пост: %d", $data[1], $data[0]);
+			
+			try {			
+				switch ($action) {
+					case Constants::ACTION_DONE:
+						$commands->done($postId);
+						$text = "Задание помеченно выполненным";
+						break;
+					case Constants::ACTION_POSTPONE:
+						$commands->postpone($postId);
+						$text = "Задание отложенно";
+						break;
+					default:
+						throw new \exceptions\UnknownQueryAction($action);
+				}
+			} catch (\exceptions\PostAlreadyDone $e) {
+				$text = "Задание уже выполнено";
+			} catch (\exceptions\PostAlreadyPostponed $e) {
+				$text = "Задание уже отложено";
+			}
+			
 			$params = [
 				'callback_query_id'		=> $query->get('id'),
 				'text'					=> $text
@@ -90,7 +125,7 @@ class KoshkaBot
 		}
 	}
 	
-	public function handleMessage(Message $message)
+	public function handleMessage(Update $update)
 	{
 		/* @var $api Api */
 		$api = $this->api;
@@ -98,38 +133,52 @@ class KoshkaBot
 		/* @var $config \Config */
 		$config = $this->config;
 		
+		/* @var $message Message */
+		$message = $update->getMessage();
+		
 		/* @var $commands Commands */
-		$commands = new Commands($config, $api, $message);
+		$commands = new Commands($config, $api, $update);
 
-		if ($message->getNewChatParticipant()) {		
+		if ($message->getNewChatParticipant()) {
+			error_log('getNewChatParticipant');
 			$commands->hello();
 		} else if ($message->getLeftChatParticipant()) {
+			error_log('getLeftChatParticipant');
 			$commands->bye();
 		} else if ($message->getSticker()) {
+			error_log('getSticker');
 			$commands->sticker();
 		} else if ($message->get('pinned_message')) {
+			error_log('pinned_message');
 			$commands->pin();
 		} else if ($message->get('successful_payment')) {
+			error_log('successful_payment');
 			$commands->wtf();
 		} else if ($message->get('invoice')) {
-			$commands->wtf();
-		} else if ($message->get('migrate_from_chat_id')) {
+			error_log('invoice');
 			$commands->wtf();
 		} else if ($message->get('migrate_to_chat_id')) {
-			$commands->wtf();
+			error_log('migrate_to_chat_id');
+			$newChatId = $message->get('migrate_to_chat_id');
+			$commands->supergroup($newChatId);
 		} else if ($message->get('channel_chat_created')) {
-			$commands->wtf();
-		} else if ($message->get('supergroup_chat_created')) {
-			$commands->wtf();
+			error_log('channel_chat_created');
+			$commands->hello();
 		} else if ($message->get('group_chat_created')) {
-			$commands->wtf();
+			error_log('group_chat_created');
+			$commands->hello();
 		} else if ($message->get('delete_chat_photo')) {
+			error_log('delete_chat_photo');
 			$commands->wtf();
 		} else if ($message->get('new_chat_photo')) {
+			error_log('new_chat_photo');
 			$commands->wtf();
 		} else if ($message->get('new_chat_title')) {
+			error_log('new_chat_title');
 			$commands->wtf();
 		} else if ($message->getText()) {
+			error_log('getText');
+			
 			/* @var $text string */
 			$text = $message->getText();
 
@@ -156,6 +205,7 @@ class KoshkaBot
 					$commands->idontunderstand();
 			}
 		} else {
+			error_log('else');
 			$commands->idontknow();
 		}
 	}

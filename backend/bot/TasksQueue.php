@@ -150,9 +150,48 @@ class TasksQueue
 		$orm->flush();
 	}
 	
+	private function fetchPost(int $postId, EntityManager $orm) : \orm\Post
+	{
+		/* @var $post \orm\Post */
+		$post = $orm->getRepository(\orm\Post::class)->find($postId);
+		
+		if (!$post)
+		{
+			throw new \exceptions\PostNotFound($postId);
+		}
+		
+		return $post;
+	}
+	
+	public function done(int $postId)
+	{
+		$orm = \DoctrineORM::getORM();
+		/* @var $requester \orm\Requester */
+		$requester = $this->checkRequester($orm);
+		/* @var $post \orm\Post */
+		$post = $this->fetchPost($postId, $orm);
+		
+		$requester->done($post);
+		
+		$orm->flush();
+	}
+	
+	public function postpone(int $postId)
+	{
+		$orm = \DoctrineORM::getORM();
+		/* @var $requester \orm\Requester */
+		$requester = $this->checkRequester($orm);
+		/* @var $post \orm\Post */
+		$post = $this->fetchPost($postId, $orm);
+		
+		$requester->postpone($post);
+		
+		$orm->flush();
+	}
+	
 	public function handleRequest(string $request) : string
 	{		
-		/* @var $requester \orm\Requester */
+		/* @var $orm EntityManager */
 		$orm = \DoctrineORM::getORM();
 		
 		$category = $this->getCategory($request, $orm);
@@ -227,6 +266,12 @@ class TasksQueue
 			{
 				$queuepointer->setIsNotLast();
 				$queuepointer->setPost($post);
+				$orm->flush();
+				
+				$this->setPost($post);
+				return $post->getText();
+			} else if ($requester->havePostponed()) {
+				$post = $requester->slicePostponed();
 				$orm->flush();
 				
 				$this->setPost($post);

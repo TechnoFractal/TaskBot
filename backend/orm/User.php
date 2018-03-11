@@ -2,16 +2,18 @@
 
 namespace orm;
 
-//use \Doctrine\ORM\Annotation as ORM;
+use \Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @Entity @Table(name="users")
+ * @Entity
  **/
-class User implements Restable
+class User implements \interfaces\Restable
 {
     /**
      * @var int
-	 * @Id @Column(type="integer") @GeneratedValue
+	 * @Id 
+	 * @Column(type="integer") 
+	 * @GeneratedValue
      */
     protected $id;
     
@@ -29,23 +31,24 @@ class User implements Restable
 	
 	/**
 	 *
-	 * @var Session[]
-	 */
+	 * @var ArrayCollection
+     * @OneToMany(targetEntity="Session", mappedBy="user")
+     */
 	protected $sessions;
 	
 	public function __construct()
     {
-        $this->sessions = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->sessions = new ArrayCollection();
     }
 	
 	public function addSession(Session $session)
     {
-        $this->sessions[] = $session;
+        $session->setUser($this);
     }
 
     public function assignedToSession(Session $session)
     {
-        $this->sessions[] = $session;
+        $this->sessions->add($session);
     }
 
     public function getId()

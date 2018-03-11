@@ -20,25 +20,48 @@
 
 namespace orm;
 
+use \Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * Description of Requestor
  *
  * @author Olga Pshenichnikova <olga@technofractal.org>
  * @Entity 
  * @Table(
- *	name="requesters",
  *	uniqueConstraints={
  *		@UniqueConstraint(columns={"tele_id"})
  *	}
  * )
  */
-class Requester implements Restable
+class Requester implements \interfaces\Restable
 {	
 	/**
      * @var int
-	 * @Id @Column(type="integer") @GeneratedValue
+	 * @Id 
+	 * @Column(type="integer") 
+	 * @GeneratedValue
      */
     protected $id;
+	
+	/**
+	 * @var ArrayCollection Last fetched task
+     * @OneToMany(targetEntity="Queuepointer", mappedBy="requester")
+     */
+	protected $queuepointers;
+	
+	/**
+	 * @var ArrayCollection
+	 * @ManyToMany(targetEntity="Post")
+	 * @JoinTable(name="performed_tasks")
+	 */
+	protected $performed;
+	
+	/**
+	 * @var ArrayCollection
+	 * @ManyToMany(targetEntity="Post")
+	 * @JoinTable(name="postponed_tasks")
+	 */	
+	protected $postponed;
 
 	/**
      * @var int
@@ -82,6 +105,12 @@ class Requester implements Restable
      */
 	protected $enabled = true;
 	
+	public function __construct() {
+		$this->queuepointers = new ArrayCollection();
+		$this->performed = new ArrayCollection();
+		$this->postponed = new ArrayCollection();
+	}
+	
 	public function isEnabled() : bool
 	{
 		return $this->enabled;
@@ -95,6 +124,45 @@ class Requester implements Restable
 	public function disable()
 	{
 		$this->enabled = false;
+	}
+	
+	public function done(Post $post)
+	{
+		if ($this->performed->contains($post))
+		{
+			throw new \exceptions\PostAlreadyDone($post);
+		}
+		
+		$this->postponed->removeElement($post);
+		$this->performed->add($post);
+	}
+	
+	public function postpone(Post $post)
+	{
+		if ($this->performed->contains($post)) 
+		{
+			throw new \exceptions\PostAlreadyDone($post);
+		}
+		
+		if ($this->postponed->contains($post))
+		{
+			throw new \exceptions\PostAlreadyPostponed($post);
+		}
+		
+		$this->postponed->add($post);
+	}
+	
+	public function havePostponed() : bool
+	{
+		return !$this->postponed->isEmpty();
+	}
+	
+	public function slicePostponed() : Post
+	{
+		/* @var $post Post */
+		$post = $this->postponed->first();
+		$this->postponed->removeElement($post);
+		return $post;
 	}
 	
 	public function isLoaded() : bool

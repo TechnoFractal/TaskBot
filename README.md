@@ -1,5 +1,7 @@
 > Powered by Koshka!!!
 
+*Version 1.0.0*
+
 # Environments configuration
 
 Further we will configure development environment for each developer  
