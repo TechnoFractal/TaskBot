@@ -12,24 +12,22 @@ namespace orm;
  * Description of Session
  *
  * @author olga
- * @Entity @Table(name="sessions")
+ * @Entity
  **/
-class Session implements Restable
+class Session implements \interfaces\Restable
 {
 	/**
      * @var int
-	 * @Id @Column(type="integer") @GeneratedValue
+	 * @Id 
+	 * @Column(type="integer") 
+	 * @GeneratedValue
      */
     protected $id;
 	
 	/**
      * @var User
-	 * @ManyToOne(targetEntity="User")
-	 * @JoinColumn(
-	 *	name="user_id", 
-	 *	referencedColumnName="id", 
-	 *	onDelete="cascade"
-	 * )
+	 * @ManyToOne(targetEntity="User", inversedBy="sessions")
+	 * @JoinColumn(onDelete="cascade")
      **/
     protected $user;
 	

@@ -10,8 +10,11 @@ namespace bot;
 
 use \Telegram\Bot\Api;
 use \Telegram\Bot\Objects\Message;
+use \Telegram\Bot\Objects\Update;
 use \Telegram\Bot\Objects\Sticker;
 use \Telegram\Bot\Objects\User;
+
+use \constants\Constants;
 
 /**
  * Description of Commands
@@ -19,7 +22,7 @@ use \Telegram\Bot\Objects\User;
  * @author Olga Pshenichnikova <olga@technofractal.org>
  */
 class Commands 
-{
+{	
 	/**
 	 *
 	 * @var Api
@@ -50,9 +53,16 @@ class Commands
 	 */
 	private $taskQueue;
 	
-	public function __construct(\Config $config, Api $api, Message $message)
+	public function __construct(\Config $config, Api $api, Update $update)
 	{
-		$data = new RequesterData($message);
+		/* @var $message Message */
+		$message = $update->getMessage();
+		/* @var $user User */
+		$user = $message->getFrom();
+		/* @var $chat Chat */
+		$chat = $message->getChat();
+		/* @var $data RequesterData */
+		$data = new RequesterData($user, $chat);
 		
 		$this->config = $config;
 		$this->api = $api;
@@ -61,7 +71,7 @@ class Commands
 		$this->taskQueue = new TasksQueue($data);
 	}
 	
-		private function getUserName(User $user)
+	private function getUserName(User $user)
 	{
 		$firstname = $user->getFirstName();
 		$lastname = $user->getLastName();
@@ -137,29 +147,40 @@ class Commands
 		]);
 	}
 	
+	public function supergroup(int $newChatId)
+	{
+		$this->api->sendMessage([ 
+			'chat_id' => $newChatId, 
+			'parse_mode' => 'HTML',
+			'text' => DataHelper::getSuperGroup()
+		]);
+	}
+	
 	public function hello()
 	{
-		/* @var $newUser User */
-		$newUser = $this->message->getNewChatParticipant();
+		if ($this->message->getNewChatParticipant()) 
+		{
+			/* @var $newUser User */
+			$newUser = $this->message->getNewChatParticipant();
+			
+			/* @var $botId int */
+			$botId = $this->config->getBotId();
 
-		/* @var $botId int */
-		$botId = $this->config->getBotId();
-
-		if ($newUser->getId() == $botId) {
-			$this->api->sendMessage([ 
-				'chat_id' => $this->chatId, 
-				'parse_mode' => 'HTML',
-				'text' => DataHelper::getHello()
-			]);
+			if ($newUser->getId() == $botId) {
+				$text = DataHelper::getHello();
+			} else {
+				$name = $this->getUserName($newUser);
+				$text = DataHelper::getHi($name);
+			}
 		} else {
-			$name = $this->getUserName($newUser);
-
-			$this->api->sendMessage([ 
-				'chat_id' => $this->chatId, 
-				'parse_mode' => 'HTML',
-				'text' => DataHelper::getHi($name)
-			]);
+			$text = DataHelper::getHello();
 		}
+		
+		$this->api->sendMessage([ 
+			'chat_id' => $this->chatId, 
+			'parse_mode' => 'HTML',
+			'text' => $text
+		]);
 	}
 	
 	public function bye()
@@ -206,17 +227,20 @@ class Commands
 		if (!$empty) {
 			$id = $this->taskQueue->getPost()->getId();
 			
+			$done = sprintf("%d:%s", $id, Constants::ACTION_DONE);
+			$postpone = sprintf("%d:%s", $id, Constants::ACTION_POSTPONE);
+			
 			$inline = json_encode([
-				'inline_keyboard' => [
-					[[
+				'inline_keyboard' => [[
+					[
 						"text" => "Выполнено",
-						"callback_data" => sprintf("%d:%s", $id, "done")
-					]],
-					[[
+						"callback_data" => $done
+					],
+					[
 						"text" => "Отложить",
-						"callback_data" => sprintf("%d:%s", $id, "postprone")
-					]]
-				] 
+						"callback_data" => $postpone
+					]
+				]] 
 			]);
 
 			$this->api->sendMessage([ 

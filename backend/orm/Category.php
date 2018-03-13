@@ -12,9 +12,9 @@ namespace orm;
  * Description of Category
  *
  * @author olga
- * @Entity @Table(name="categories")
+ * @Entity
  */
-class Category implements Restable
+class Category implements \interfaces\Restable
 {
 	/**
      * @var int

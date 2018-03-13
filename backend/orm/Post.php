@@ -12,13 +12,15 @@ namespace orm;
  * Description of Post
  *
  * @author olga
- * @Entity @Table(name="posts")
+ * @Entity
  */
-class Post implements Restable
+class Post implements \interfaces\Restable
 {
 	/**
      * @var int
-	 * @Id @Column(type="integer") @GeneratedValue
+	 * @Id 
+	 * @Column(type="integer") 
+	 * @GeneratedValue
      */
     protected $id;
 
@@ -31,7 +33,7 @@ class Post implements Restable
 	
 	/**
      * @var Category
-	 * @ManyToOne(targetEntity="Category", inversedBy="categories")
+	 * @ManyToOne(targetEntity="Category")
      **/
     protected $category;
 	

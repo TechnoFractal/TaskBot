@@ -41,6 +41,7 @@ class DataHelper
 	const FILE_INFO = "info";
 	const FILE_CONTACTS = "contacts";
 	const FILE_PIN = "pin";
+	const FILE_SUPERGROUP = "supergroup";
 	const FILE_NOTASKS = "notasks";
 	const FILE_NEWTASKS = "newtask";	
 	
@@ -199,6 +200,11 @@ class DataHelper
 	public static function getStop() : string
 	{
 		return self::getData(self::FILE_STOP);
+	}
+	
+	public static function getSuperGroup() : string
+	{
+		return self::getData(self::FILE_SUPERGROUP);
 	}
 	
 	public static function getPin() : string
