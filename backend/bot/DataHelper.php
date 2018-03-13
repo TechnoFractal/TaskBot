@@ -165,7 +165,7 @@ class DataHelper
 	public static function getNotFound(bool $isMale) : string
 	{
 		$text = self::getData(self::FILE_NOTFOUND);
-		$gender = $isMale ? 'Молодой человек' : 'Уважаемая дама';
+		$gender = $isMale ? '' : 'а';
 		return str_replace('{gender}', $gender, $text);
 	}
 	
