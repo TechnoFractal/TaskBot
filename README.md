@@ -15,24 +15,24 @@ Or it can be two developers environments and one remote production.
 On both we need:  
 
 * Debian based Linux destribution
-* Git
-* NodeJS
-* NodeJS module - react-scripts
-* Apache2
-* Apache2 module - curl
-* Apache2 module - mysql
-* PHP 7.*
-* PECR
-* Composer
-* Doctrine
-* CodeIgniter
-* CodeIgniterRestServer
-* MySQL
-* OpenSSL
+* Git - distributed version control system
+* NodeJS (Node.js) - JavaScript run-time environment for executing JavaScript code server-side
+* NodeJS module 'react-scripts'
+* Apache2 - web server software
+* Apache2 module 'curl'
+* Apache2 module 'mysql'
+* PHP 7.* - server-side scripting language
+* PECL - repository for PHP Extensions
+* Composer - package manager for PHP
+* Doctrine - set of PHP libraries for converting data to object model
+* CodeIgniter - PHP framework
+* CodeIgniter Rest Server - a RESTful server implementation for CodeIgniter
+* MySQL - relational database management system
+* OpenSSL - cryptography library and toolkit for secure protocols
 
 _You need `nginx` on both environment (development and production), thus  
 there is bug in CodeIgniter with `base_url` configuration, and thus it is  
-impossible to set `homapage` for react-js in `npm start` mode._  
+impossible to set `homepage` for react-js in `npm start` mode._  
 
 ## @BotFather
 
