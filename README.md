@@ -259,9 +259,11 @@ insert into users(`login`, `password`) values (
 select * from users;
 ```
 
-You can `md5` the data from the shell using `md5sum` command:
+Use `apg` command for retrive random data.  
+Then you can `md5` the data from the shell using `md5sum` command:
 
 ```
+apg
 echo -n "password" | md5sum
 ```
 
